@@ -65,6 +65,6 @@ TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 ADD_TEST(Dilate2D dilate2D ${CMAKE_SOURCE_DIR}/cthead1.tif out2d.tif hout2d.tif)
 ADD_TEST(Dilate2DCompare ImageCompare out2d.tif hout2d.tif)
 
-ADD_TEST(Dilate3D dilate3D ${CMAKE_SOURCE_DIR}/ES.hdr out3d.tif hout3d.tif)
+ADD_TEST(Dilate3D dilate3D ${CMAKE_SOURCE_DIR}/ESCells.hdr out3d.tif hout3d.tif)
 ADD_TEST(Dilate3DCompare ImageCompare out3d.tif hout3d.tif)
 
