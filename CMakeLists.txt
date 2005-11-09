@@ -1,5 +1,5 @@
 #Change PROJECT_NAME to the name of your project
-PROJECT(PROJECT_NAME)
+PROJECT(histoErodeDilate)
 
 #include some macros from another file...
 INCLUDE(IJMacros.txt)
@@ -35,8 +35,24 @@ SET(Libraries
 #MyExe will be built using the files MyClass.h and MyClass.cxx, and it will
 #be linked to all the libraries you specified above. 
 #You can build more than one executable per project
-SET(CurrentExe "MyExe")
-ADD_EXECUTABLE(${CurrentExe} MyClass.h MyClass.cxx) 
+SET(CurrentExe "perf2D")
+ADD_EXECUTABLE(${CurrentExe} perf2D.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
+SET(CurrentExe "perf3D")
+ADD_EXECUTABLE(${CurrentExe} perf3D.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
+SET(CurrentExe "perf_threads")
+ADD_EXECUTABLE(${CurrentExe} perf_threads.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
+SET(CurrentExe "dilate2D")
+ADD_EXECUTABLE(${CurrentExe} dilate2D.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
+SET(CurrentExe "dilate3D")
+ADD_EXECUTABLE(${CurrentExe} dilate3D.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 #the following line is an example of how to add a test to your project.
@@ -45,5 +61,10 @@ TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 #project or an external executable.  After that list any args that are needed
 #for this test.  Include as many tests as you like.  If your project doesn't have
 #any tests you can comment out or delete the following line.
-ADD_TEST(Testname ExecutableToRun arg1 arg2 arg3)
-ADD_TEST(CompareImage ImageCompare ${CMAKE_SOURCE_DIR}/img1.png ${CMAKE_SOURCE_DIR}/img1.png.base.png)
+
+ADD_TEST(Dilate2D dilate2D ${CMAKE_SOURCE_DIR}/cthead1.tif out2d.tif hout2d.tif)
+ADD_TEST(Dilate2DCompare ImageCompare out2d.tif hout2d.tif)
+
+ADD_TEST(Dilate3D dilate3D ${CMAKE_SOURCE_DIR}/ES.hdr out3d.tif hout3d.tif)
+ADD_TEST(Dilate3DCompare ImageCompare out3d.tif hout3d.tif)
+
