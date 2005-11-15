@@ -59,6 +59,22 @@ SET(CurrentExe "bestAxe2D")
 ADD_EXECUTABLE(${CurrentExe} bestAxe2D.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
+SET(CurrentExe "erode2D")
+ADD_EXECUTABLE(${CurrentExe} erode2D.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
+SET(CurrentExe "erode3D")
+ADD_EXECUTABLE(${CurrentExe} erode3D.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
+SET(CurrentExe "gradient2D")
+ADD_EXECUTABLE(${CurrentExe} gradient2D.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
+SET(CurrentExe "gradient3D")
+ADD_EXECUTABLE(${CurrentExe} gradient3D.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
 #the following line is an example of how to add a test to your project.
 #Testname is the title for this particular test.  ExecutableToRun is the
 #program which will be running this test.  It can either be a part of this
@@ -66,9 +82,21 @@ TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 #for this test.  Include as many tests as you like.  If your project doesn't have
 #any tests you can comment out or delete the following line.
 
-ADD_TEST(Dilate2D dilate2D ${CMAKE_SOURCE_DIR}/cthead1.tif out2d.tif hout2d.tif)
-ADD_TEST(Dilate2DCompare ImageCompare out2d.tif hout2d.tif)
+ADD_TEST(Dilate2D dilate2D ${CMAKE_SOURCE_DIR}/cthead1.tif dilate2d.tif hdilate2d.tif)
+ADD_TEST(Dilate2DCompare ImageCompare dilate2d.tif hdilate2d.tif)
 
-ADD_TEST(Dilate3D dilate3D ${CMAKE_SOURCE_DIR}/ESCells.hdr out3d.tif hout3d.tif)
-ADD_TEST(Dilate3DCompare ImageCompare out3d.tif hout3d.tif)
+ADD_TEST(Dilate3D dilate3D ${CMAKE_SOURCE_DIR}/ESCells.hdr dilate3d.tif hdilate3d.tif)
+ADD_TEST(Dilate3DCompare ImageCompare dilate3d.tif hdilate3d.tif)
+
+ADD_TEST(Erode2D erode2D ${CMAKE_SOURCE_DIR}/cthead1.tif erode2d.tif herode2d.tif)
+ADD_TEST(Erode2DCompare ImageCompare erode2d.tif herode2d.tif)
+
+ADD_TEST(Erode3D erode3D ${CMAKE_SOURCE_DIR}/ESCells.hdr erode3d.tif herode3d.tif)
+ADD_TEST(Erode3DCompare ImageCompare erode3d.tif herode3d.tif)
+
+ADD_TEST(Gradient2D gradient2D ${CMAKE_SOURCE_DIR}/cthead1.tif gradient2d.tif hgradient2d.tif)
+ADD_TEST(Gradient2DCompare ImageCompare gradient2d.tif hgradient2d.tif)
+
+ADD_TEST(Gradient3D gradient3D ${CMAKE_SOURCE_DIR}/ESCells.hdr gradient3d.tif hgradient3d.tif)
+ADD_TEST(Gradient3DCompare ImageCompare gradient3d.tif hgradient3d.tif)
 
