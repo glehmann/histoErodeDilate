@@ -233,28 +233,27 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
   
     OffsetType centerOffset;
     for( int axe=0; axe<ImageDimension; axe++)
-      { centerOffset[axe] = m_Kernel.GetSize()[axe] / 2; }
-    
+      { centerOffset[axe] = stRegion.GetSize()[axe] / 2; }
+  
     while( axe >= 0 )
       {
       // increment the value on the current axe
       offset[axe] = direction[axe];
       if( outputRegionForThread.IsInside( currentIdx + offset ) )
         {
-//         stRegion.SetIndex( currentIdx + offset - centerOffset );
-//         if( outputRegionForThread.IsInside( stRegion ) )
-//           {
-// /*          std::cout << stRegion.GetIndex() << "-" << stRegion.GetSize() << std::endl;*/
-//           // update the histogram
-//           const OffsetListType* addedList = &added[offset]; // it's very important for performances to get a pointer and not a copy
-//           for( typename OffsetListType::const_iterator addedIt = addedList->begin(); addedIt != addedList->end(); addedIt++ )
-//             { histogram[inputImage->GetPixel( currentIdx + (*addedIt) )]++; }
-//           const OffsetListType* removedList = &removed[offset];
-//           for( typename OffsetListType::const_iterator removedIt = removedList->begin(); removedIt != removedList->end(); removedIt++ )
-//             { histogram[ inputImage->GetPixel( currentIdx + (*removedIt) ) ]--; }
-//           }
-//         else
-//           {
+        stRegion.SetIndex( currentIdx + offset - centerOffset );
+        if( inputRegion.IsInside( stRegion ) )
+          {
+          // update the histogram
+          const OffsetListType* addedList = &added[offset]; // it's very important for performances to get a pointer and not a copy
+          for( typename OffsetListType::const_iterator addedIt = addedList->begin(); addedIt != addedList->end(); addedIt++ )
+            { histogram[ inputImage->GetPixel( currentIdx + (*addedIt) ) ]++; }
+          const OffsetListType* removedList = &removed[offset];
+          for( typename OffsetListType::const_iterator removedIt = removedList->begin(); removedIt != removedList->end(); removedIt++ )
+            { histogram[ inputImage->GetPixel( currentIdx + (*removedIt) ) ]--; }
+          }
+        else
+          {
           // update the histogram
           const OffsetListType* addedList = &added[offset];
           for( typename OffsetListType::const_iterator addedIt = addedList->begin(); addedIt != addedList->end(); addedIt++ )
@@ -270,7 +269,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
             if( inputRegion.IsInside( idx ) )
               { histogram[ inputImage->GetPixel( idx ) ]--; }
             }
-//           }
+           }
             
         for( typename HistogramType::iterator mapIt = histogram.begin(); mapIt != histogram.end(); mapIt++ )
           {
