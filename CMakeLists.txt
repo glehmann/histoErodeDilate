@@ -55,6 +55,10 @@ SET(CurrentExe "dilate3D")
 ADD_EXECUTABLE(${CurrentExe} dilate3D.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
+SET(CurrentExe "bestAxe2D")
+ADD_EXECUTABLE(${CurrentExe} bestAxe2D.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
 #the following line is an example of how to add a test to your project.
 #Testname is the title for this particular test.  ExecutableToRun is the
 #program which will be running this test.  It can either be a part of this
