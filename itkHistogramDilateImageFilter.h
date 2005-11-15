@@ -18,6 +18,8 @@
 #define __itkHistogramDilateImageFilter_h
 
 #include "itkImageToImageFilter.h"
+#include <list>
+#include <map>
 
 namespace itk {
 
@@ -109,8 +111,12 @@ public:
   /** n-dimensional Kernel radius. */
   typedef typename KernelType::SizeType RadiusType ;
 
+  typedef typename std::list< OffsetType > OffsetListType;
+
+  typedef typename std::map< OffsetType, OffsetListType, typename Functor::OffsetLexicographicCompare<ImageDimension> > OffsetMapType;
+
   /** Set kernel (structuring element). */
-  itkSetMacro(Kernel, KernelType);
+  void SetKernel( const KernelType& kernel );
 
   /** Get the kernel (structuring element). */
   itkGetConstReferenceMacro(Kernel, KernelType);
@@ -140,6 +146,14 @@ private:
   /** kernel or structuring element to use. */
   KernelType m_Kernel ;
 
+  // store the added and removed pixel offset in a list
+  OffsetMapType m_AddedOffsets;
+  OffsetMapType m_RemovedOffsets;
+
+  // store the offset of the kernel to initialize the histogram
+  OffsetListType m_KernelOffsets;
+
+  typename itk::FixedArray< int, ImageDimension > m_Axes;
 } ; // end of class
 
 } // end namespace itk

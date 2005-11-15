@@ -18,8 +18,6 @@
 #define __itkHistogramDilateImageFilter_txx
 
 #include "itkHistogramDilateImageFilter.h"
-#include <list>
-#include <map>
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
 #include "itkOffset.h"
@@ -86,23 +84,23 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
     }
 }
 
-template<class TInputImage, class TOutputImage, class TKernel>
+template< class TInputImage, class TOutputImage, class TKernel>
 void
-HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
-::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
-                       int threadId) 
+HistogramDilateImageFilter< TInputImage, TOutputImage, TKernel>
+::SetKernel( const KernelType& kernel )
 {
+  // store the kernel !!
+  m_Kernel = kernel;
+
+  // clear the already stored values
+  m_AddedOffsets.clear();
+  m_RemovedOffsets.clear();
+  m_KernelOffsets.clear();
+  //m_Axes
+
   // first, build the list of offsets of added and removed pixels when the 
   // structuring element move of 1 pixel on 1 axe; do it for the 2 directions
   // on each axes.
-  
-  // store the added and removed pixel offset in a list
-  typedef typename std::list< OffsetType > OffsetListType;
-  typedef typename std::map< OffsetType, OffsetListType, typename Functor::OffsetLexicographicCompare<ImageDimension> > OffsetMapType;
-  OffsetMapType added;
-  OffsetMapType removed;
-  // store the offset of the kernel to initialize the histogram
-  OffsetListType kernelOffsetList;
   
   // transform the structuring element in an image for an easier
   // access to the data
@@ -123,12 +121,11 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
   
   while( !kernelImageIt.IsAtEnd() )
     {
-/*    std::cout << "is set: " << (*kernel_it > 0) << std::endl;*/
     kernelImageIt.Set( *kernel_it > 0 );
     if( *kernel_it > 0 )
       {
       kernelImageIt.Set( true );
-      kernelOffsetList.push_front( kernelImageIt.GetIndex() - centerIndex );
+      m_KernelOffsets.push_front( kernelImageIt.GetIndex() - centerIndex );
       }
     else
       {
@@ -165,13 +162,13 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
             {
             if( !tmpSEImage->GetPixel( nextIdx ) )
               {
-                added[refOffset].push_front( nextIdx - centerIndex );
+                m_AddedOffsets[refOffset].push_front( nextIdx - centerIndex );
                 axeCount[axe]++;
               }
             }
           else
             {
-              added[refOffset].push_front( nextIdx - centerIndex );
+              m_AddedOffsets[refOffset].push_front( nextIdx - centerIndex );
               axeCount[axe]++;
             }
           // search for removed pixel during a translation
@@ -180,13 +177,13 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
             {
             if( !tmpSEImage->GetPixel( prevIdx ) )
               {
-                removed[refOffset].push_front( idx - centerIndex );
+                m_RemovedOffsets[refOffset].push_front( idx - centerIndex );
                 axeCount[axe]++;
               }
             }
           else
             {
-              removed[refOffset].push_front( idx - centerIndex );
+              m_RemovedOffsets[refOffset].push_front( idx - centerIndex );
               axeCount[axe]++;
             }
 
@@ -204,12 +201,19 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
       invertedCount.insert( typename MapCountType::value_type( axeCount[i], i ) );
       }
 
-    typename itk::FixedArray< int, ImageDimension > axes;
     int i=0;
     for( typename MapCountType::iterator it=invertedCount.begin(); it!=invertedCount.end(); it++, i++ )
       {
-      axes[i] = it->second;
+      m_Axes[i] = it->second;
       }
+}
+
+template<class TInputImage, class TOutputImage, class TKernel>
+void
+HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
+::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
+                       int threadId) 
+{
 /*std::cout << "++" << axes << "--" << std::endl;*/
     
     // declare the type used to store the histogram, and instanciate the histogram
@@ -225,7 +229,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
     RegionType inputRegion = inputImage->GetRequestedRegion();
     
     // initialize the histogram
-    for( typename OffsetListType::iterator listIt = kernelOffsetList.begin(); listIt != kernelOffsetList.end(); listIt++ )
+    for( typename OffsetListType::iterator listIt = m_KernelOffsets.begin(); listIt != m_KernelOffsets.end(); listIt++ )
       {
       IndexType idx = outputRegionForThread.GetIndex() + (*listIt);
       if( inputRegion.IsInside( idx ) )
@@ -261,31 +265,31 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
     while( axe >= 0 )
       {
       // increment the value on the current axe
-      offset[axes[axe]] = direction[axes[axe]];
+      offset[m_Axes[axe]] = direction[m_Axes[axe]];
       if( outputRegionForThread.IsInside( currentIdx + offset ) )
         {
         stRegion.SetIndex( currentIdx + offset - centerOffset );
         if( inputRegion.IsInside( stRegion ) )
           {
           // update the histogram
-          const OffsetListType* addedList = &added[offset]; // it's very important for performances to get a pointer and not a copy
+          const OffsetListType* addedList = &m_AddedOffsets[offset]; // it's very important for performances to get a pointer and not a copy
           for( typename OffsetListType::const_iterator addedIt = addedList->begin(); addedIt != addedList->end(); addedIt++ )
             { histogram[ inputImage->GetPixel( currentIdx + (*addedIt) ) ]++; }
-          const OffsetListType* removedList = &removed[offset];
+          const OffsetListType* removedList = &m_RemovedOffsets[offset];
           for( typename OffsetListType::const_iterator removedIt = removedList->begin(); removedIt != removedList->end(); removedIt++ )
             { histogram[ inputImage->GetPixel( currentIdx + (*removedIt) ) ]--; }
           }
         else
           {
           // update the histogram
-          const OffsetListType* addedList = &added[offset];
+          const OffsetListType* addedList = &m_AddedOffsets[offset];
           for( typename OffsetListType::const_iterator addedIt = addedList->begin(); addedIt != addedList->end(); addedIt++ )
             {
             IndexType idx = currentIdx + (*addedIt);
             if( inputRegion.IsInside( idx ) )
               { histogram[inputImage->GetPixel( idx )]++; }
             }
-          const OffsetListType* removedList = &removed[offset];
+          const OffsetListType* removedList = &m_RemovedOffsets[offset];
           for( typename OffsetListType::const_iterator removedIt = removedList->begin(); removedIt != removedList->end(); removedIt++ )
             {
             IndexType idx = currentIdx + (*removedIt);
@@ -319,7 +323,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
         oIt.Set( value );*/
         outputImage->SetPixel( currentIdx, value );
 
-        offset[axes[axe]] = 0;
+        offset[m_Axes[axe]] = 0;
         // the axe must be the last one
         axe = ImageDimension - 1;
         }
@@ -329,10 +333,10 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
         // we need to switch to another axe
         
         // invert the direction of the current axe
-        direction[axes[axe]] *= -1;
+        direction[m_Axes[axe]] *= -1;
         // set the offset of the current axe to 0
         // -> offset == [0]*dim
-        offset[axes[axe]] = 0;
+        offset[m_Axes[axe]] = 0;
         // and switch to another axe
         axe--;
         }
