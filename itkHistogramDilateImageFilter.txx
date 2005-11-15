@@ -19,6 +19,7 @@
 
 #include "itkHistogramDilateImageFilter.h"
 #include <list>
+#include <map>
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
 #include "itkOffset.h"
@@ -138,7 +139,10 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
     }
     
 /*  std::cout << "image copied" << std::endl;*/
-    
+
+  typename itk::FixedArray< unsigned long, ImageDimension > axeCount;
+  axeCount.Fill( 0 );
+
   for( int axe=0; axe<ImageDimension; axe++)
     {
 /*  std::cout << "axe: " << axe << std::endl;*/
@@ -162,11 +166,13 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
             if( !tmpSEImage->GetPixel( nextIdx ) )
               {
                 added[refOffset].push_front( nextIdx - centerIndex );
+                axeCount[axe]++;
               }
             }
           else
             {
               added[refOffset].push_front( nextIdx - centerIndex );
+              axeCount[axe]++;
             }
           // search for removed pixel during a translation
           IndexType prevIdx = idx - refOffset;
@@ -175,11 +181,13 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
             if( !tmpSEImage->GetPixel( prevIdx ) )
               {
                 removed[refOffset].push_front( idx - centerIndex );
+                axeCount[axe]++;
               }
             }
           else
             {
               removed[refOffset].push_front( idx - centerIndex );
+              axeCount[axe]++;
             }
 
           }
@@ -187,8 +195,23 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
       }
     }
     
+    // search for the best axe
+/*    std::cout << "--" << axeCount << "--" << std::endl;*/
+    typedef typename std::multimap<unsigned long, int, typename std::greater< unsigned long > > MapCountType;
+    MapCountType invertedCount;
+    for( int i=0; i<ImageDimension; i++ )
+      {
+      invertedCount.insert( typename MapCountType::value_type( axeCount[i], i ) );
+      }
+
+    typename itk::FixedArray< int, ImageDimension > axes;
+    int i=0;
+    for( typename MapCountType::iterator it=invertedCount.begin(); it!=invertedCount.end(); it++, i++ )
+      {
+      axes[i] = it->second;
+      }
+/*std::cout << "++" << axes << "--" << std::endl;*/
     
-      
     // declare the type used to store the histogram, and instanciate the histogram
     typedef typename std::map< PixelType, unsigned long, typename std::greater< unsigned long > > HistogramType;
     HistogramType histogram;
@@ -238,7 +261,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
     while( axe >= 0 )
       {
       // increment the value on the current axe
-      offset[axe] = direction[axe];
+      offset[axes[axe]] = direction[axes[axe]];
       if( outputRegionForThread.IsInside( currentIdx + offset ) )
         {
         stRegion.SetIndex( currentIdx + offset - centerOffset );
@@ -296,7 +319,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
         oIt.Set( value );*/
         outputImage->SetPixel( currentIdx, value );
 
-        offset[axe] = 0;
+        offset[axes[axe]] = 0;
         // the axe must be the last one
         axe = ImageDimension - 1;
         }
@@ -306,10 +329,10 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
         // we need to switch to another axe
         
         // invert the direction of the current axe
-        direction[axe] *= -1;
+        direction[axes[axe]] *= -1;
         // set the offset of the current axe to 0
         // -> offset == [0]*dim
-        offset[axe] = 0;
+        offset[axes[axe]] = 0;
         // and switch to another axe
         axe--;
         }
