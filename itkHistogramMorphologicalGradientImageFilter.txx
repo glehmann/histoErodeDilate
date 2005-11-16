@@ -239,7 +239,7 @@ HistogramMorphologicalGradientImageFilter<TInputImage, TOutputImage, TKernel>
       
       }
     // and set the first point of the image
-    outputImage->SetPixel( outputRegionForThread.GetIndex(), histogram.begin()->first );
+    outputImage->SetPixel( outputRegionForThread.GetIndex(), histogram.rbegin()->first - histogram.begin()->first );
     
 //         for( typename HistogramType::iterator mapIt = histogram.begin(); mapIt != histogram.end(); mapIt++ )
 //           {
