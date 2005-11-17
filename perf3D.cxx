@@ -2,6 +2,10 @@
 #include "itkImageFileWriter.h"
 #include "itkHistogramDilateImageFilter.h"
 #include "itkGrayscaleDilateImageFilter.h"
+#include "itkHistogramErodeImageFilter.h"
+#include "itkGrayscaleErodeImageFilter.h"
+#include "itkHistogramMorphologicalGradientImageFilter.h"
+#include "itkMorphologicalGradientImageFilter.h"
 #include "itkBinaryBallStructuringElement.h"
 #include "itkTimeProbe.h"
 #include <vector>
@@ -29,11 +33,25 @@ int main(int, char * argv[])
   dilate->SetInput( reader->GetOutput() );
   dilate->SetNumberOfThreads( 1 );
   
-/*  // write 
-  typedef itk::ImageFileWriter< IType > WriterType;
-  WriterType::Pointer writer = WriterType::New();
-  writer->SetInput( dilate->GetOutput() );
-  writer->SetFileName( argv[2] );*/
+  typedef itk::HistogramErodeImageFilter< IType, IType, SRType > HErodeType;
+  HErodeType::Pointer herode = HErodeType::New();
+  herode->SetInput( reader->GetOutput() );
+  herode->SetNumberOfThreads( 1 );
+  
+  typedef itk::GrayscaleErodeImageFilter< IType, IType, SRType > ErodeType;
+  ErodeType::Pointer erode = ErodeType::New();
+  erode->SetInput( reader->GetOutput() );
+  erode->SetNumberOfThreads( 1 );
+  
+  typedef itk::HistogramMorphologicalGradientImageFilter< IType, IType, SRType > HMorphologicalGradientType;
+  HMorphologicalGradientType::Pointer hgradient = HMorphologicalGradientType::New();
+  hgradient->SetInput( reader->GetOutput() );
+  hgradient->SetNumberOfThreads( 1 );
+  
+  typedef itk::MorphologicalGradientImageFilter< IType, IType, SRType > MorphologicalGradientType;
+  MorphologicalGradientType::Pointer gradient = MorphologicalGradientType::New();
+  gradient->SetInput( reader->GetOutput() );
+  gradient->SetNumberOfThreads( 1 );
   
   reader->Update();
   
@@ -43,10 +61,18 @@ int main(int, char * argv[])
   radiusList.push_back( 15 );
   radiusList.push_back( 20 );
   
+  std::cout << "size" << "\t" << "d" << "\t" << "hd" << "\t" << "e" << "\t" << "he" << "\t" << "g" << "\t" << "hg" << std::endl;
+
   for( std::vector< int >::iterator it=radiusList.begin(); it !=radiusList.end() ; it++)
     {
-    itk::TimeProbe time;
-    itk::TimeProbe htime;
+    itk::TimeProbe dtime;
+    itk::TimeProbe hdtime;
+
+    itk::TimeProbe etime;
+    itk::TimeProbe hetime;
+  
+    itk::TimeProbe gtime;
+    itk::TimeProbe hgtime;
   
     SRType kernel;
     kernel.SetRadius( *it );
@@ -55,21 +81,51 @@ int main(int, char * argv[])
     dilate->SetKernel( kernel );
     hdilate->SetKernel( kernel );
     
-    for( int i=0; i<10; i++ )
+    erode->SetKernel( kernel );
+    herode->SetKernel( kernel );
+    
+    gradient->SetKernel( kernel );
+    hgradient->SetKernel( kernel );
+
+    int nbOfRepeats;
+    if( *it <= 5 )
+      { nbOfRepeats = 10; }
+    else if( *it <= 10 )
+      { nbOfRepeats = 5; }
+    else
+      { nbOfRepeats = 2; }
+
+    for( int i=0; i<nbOfRepeats; i++ )
       {
-      time.Start();
+      dtime.Start();
       dilate->Update();
-      time.Stop();
-      
-      htime.Start();
-      hdilate->Update();
-      htime.Stop();
-      
+      dtime.Stop();
       dilate->Modified();
+      hdtime.Start();
+      hdilate->Update();
+      hdtime.Stop();
       hdilate->Modified();
+      
+      etime.Start();
+      erode->Update();
+      etime.Stop();
+      erode->Modified();
+      hetime.Start();
+      herode->Update();
+      hetime.Stop();
+      herode->Modified();
+      
+      gtime.Start();
+      gradient->Update();
+      gtime.Stop();
+      gradient->Modified();
+      hgtime.Start();
+      hgradient->Update();
+      hgtime.Stop();
+      hgradient->Modified();
       }
       
-    std::cout << *it << "\t" << time.GetMeanTime() << "\t" << htime.GetMeanTime() << std::endl;
+    std::cout << *it << "\t" << dtime.GetMeanTime() << "\t" << hdtime.GetMeanTime() << "\t" << etime.GetMeanTime() << "\t" << hetime.GetMeanTime()<< "\t" << gtime.GetMeanTime() << "\t" << hgtime.GetMeanTime() << std::endl;
     }
   
   
