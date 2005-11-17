@@ -64,7 +64,7 @@ int main(int, char * argv[])
   radiusList.push_back( 50 );
   radiusList.push_back( 100 );
   
-  std::cout << "radius" << "\t" << "nb" << "\t" << "d" << "\t" << "hd" << "\t" << "e" << "\t" << "he" << "\t" << "g" << "\t" << "hg" << std::endl;
+  std::cout << "#radius" << "\t" << "total" << "\t" << "nb" << "\t" << "hnb" << "\t" << "d" << "\t" << "hd" << "\t" << "e" << "\t" << "he" << "\t" << "g" << "\t" << "hg" << std::endl;
 
   for( std::vector< int >::iterator it=radiusList.begin(); it !=radiusList.end() ; it++)
     {
@@ -140,7 +140,7 @@ int main(int, char * argv[])
       hgradient->Modified();
       }
       
-    std::cout << *it << "\t" << nbOfNeighbors << "\t" << dtime.GetMeanTime() << "\t" << hdtime.GetMeanTime() << "\t" << etime.GetMeanTime() << "\t" << hetime.GetMeanTime()<< "\t" << gtime.GetMeanTime() << "\t" << hgtime.GetMeanTime() << std::endl;
+    std::cout << *it << "\t" << (*it*2+1)*(*it*2+1) << "\t" << nbOfNeighbors << "\t"<< hdilate->GetPixelsPerTranslation() << "\t" << dtime.GetMeanTime() << "\t" << hdtime.GetMeanTime() << "\t" << etime.GetMeanTime() << "\t" << hetime.GetMeanTime()<< "\t" << gtime.GetMeanTime() << "\t" << hgtime.GetMeanTime() << std::endl;
     }
   
   
