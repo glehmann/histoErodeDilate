@@ -91,6 +91,8 @@ public:
   /** Get the kernel (structuring element). */
   itkGetConstReferenceMacro(Kernel, KernelType);
   
+  itkGetMacro(PixelsPerTranslation, unsigned long);
+  
   /** HistogramDilateImageFilter need to make sure they request enough of an
    * input image to account for the structuring element size.  The input
    * requested region is expanded by the radius of the structuring element.
@@ -124,6 +126,8 @@ private:
   OffsetListType m_KernelOffsets;
 
   typename itk::FixedArray< int, ImageDimension > m_Axes;
+
+  unsigned long m_PixelsPerTranslation;
 } ; // end of class
 
 } // end namespace itk

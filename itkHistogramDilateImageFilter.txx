@@ -32,6 +32,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
 ::HistogramDilateImageFilter()
   : m_Kernel()
 {
+  m_PixelsPerTranslation = 0;
 }
 
 template<class TInputImage, class TOutputImage, class TKernel>
@@ -98,6 +99,7 @@ HistogramDilateImageFilter< TInputImage, TOutputImage, TKernel>
   m_RemovedOffsets.clear();
   m_KernelOffsets.clear();
   //m_Axes
+  //m_PixelsPerTranslation
 
   // first, build the list of offsets of added and removed pixels when the 
   // structuring element move of 1 pixel on 1 axe; do it for the 2 directions
@@ -202,6 +204,8 @@ HistogramDilateImageFilter< TInputImage, TOutputImage, TKernel>
       {
       m_Axes[i] = it->second;
       }
+
+    m_PixelsPerTranslation = axeCount[m_Axes[ImageDimension - 1]] / 2;  // divided by 2 because there is 2 direction on the axe
 }
 
 template<class TInputImage, class TOutputImage, class TKernel>
