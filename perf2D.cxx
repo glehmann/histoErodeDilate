@@ -64,7 +64,7 @@ int main(int, char * argv[])
   radiusList.push_back( 50 );
   radiusList.push_back( 100 );
   
-  std::cout << "size" << "\t" << "d" << "\t" << "hd" << "\t" << "e" << "\t" << "he" << "\t" << "g" << "\t" << "hg" << std::endl;
+  std::cout << "radius" << "\t" << "nb" << "\t" << "d" << "\t" << "hd" << "\t" << "e" << "\t" << "he" << "\t" << "g" << "\t" << "hg" << std::endl;
 
   for( std::vector< int >::iterator it=radiusList.begin(); it !=radiusList.end() ; it++)
     {
@@ -80,6 +80,15 @@ int main(int, char * argv[])
     SRType kernel;
     kernel.SetRadius( *it );
     kernel.CreateStructuringElement();
+
+    // compute the number of activated neighbors in the structuring element
+    unsigned long nbOfNeighbors = 0;
+    for( SRType::Iterator nit=kernel.Begin(); nit!=kernel.End(); nit++ )
+      {
+      if( *nit > 0 )
+        { nbOfNeighbors++; }
+      }
+
   
     dilate->SetKernel( kernel );
     hdilate->SetKernel( kernel );
@@ -99,6 +108,7 @@ int main(int, char * argv[])
       { nbOfRepeats = 5; }
     else
       { nbOfRepeats = 2; }
+    //nbOfRepeats = 1;
 
     for( int i=0; i<nbOfRepeats; i++ )
       {
@@ -130,7 +140,7 @@ int main(int, char * argv[])
       hgradient->Modified();
       }
       
-    std::cout << *it << "\t" << dtime.GetMeanTime() << "\t" << hdtime.GetMeanTime() << "\t" << etime.GetMeanTime() << "\t" << hetime.GetMeanTime()<< "\t" << gtime.GetMeanTime() << "\t" << hgtime.GetMeanTime() << std::endl;
+    std::cout << *it << "\t" << nbOfNeighbors << "\t" << dtime.GetMeanTime() << "\t" << hdtime.GetMeanTime() << "\t" << etime.GetMeanTime() << "\t" << hetime.GetMeanTime()<< "\t" << gtime.GetMeanTime() << "\t" << hgtime.GetMeanTime() << std::endl;
     }
   
   
