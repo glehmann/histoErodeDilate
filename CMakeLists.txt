@@ -47,6 +47,10 @@ SET(CurrentExe "perf_threads")
 ADD_EXECUTABLE(${CurrentExe} perf_threads.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
+SET(CurrentExe "perf_binary")
+ADD_EXECUTABLE(${CurrentExe} perf_binary.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
 SET(CurrentExe "dilate2D")
 ADD_EXECUTABLE(${CurrentExe} dilate2D.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
