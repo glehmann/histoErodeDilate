@@ -21,6 +21,7 @@
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
 #include "itkOffset.h"
+#include "itkProgressReporter.h"
 
 
 namespace itk {
@@ -209,6 +210,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
                        int threadId) 
 {
+    ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels());
     
     // declare the type used to store the histogram, and instanciate the histogram
     typedef typename std::map< PixelType, unsigned long, typename std::greater< unsigned long > > HistogramType;
@@ -234,7 +236,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
       }
     // and set the first point of the image
     outputImage->SetPixel( outputRegionForThread.GetIndex(), histogram.begin()->first );
-    
+    progress.CompletedPixel();
 
     // now move the histogram
     itk::FixedArray<short, ImageDimension> direction;
@@ -318,6 +320,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
 /*        oIt += offset;
         oIt.Set( value );*/
         outputImage->SetPixel( currentIdx, value );
+        progress.CompletedPixel();
 
         offset[m_Axes[axe]] = 0;
         // the axe must be the last one
