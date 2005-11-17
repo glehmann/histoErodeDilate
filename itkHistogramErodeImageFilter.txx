@@ -135,24 +135,20 @@ HistogramErodeImageFilter< TInputImage, TOutputImage, TKernel>
     ++kernel_it;
     }
     
-/*  std::cout << "image copied" << std::endl;*/
 
   typename itk::FixedArray< unsigned long, ImageDimension > axeCount;
   axeCount.Fill( 0 );
 
   for( int axe=0; axe<ImageDimension; axe++)
     {
-/*  std::cout << "axe: " << axe << std::endl;*/
     OffsetType refOffset;
     refOffset.Fill( 0 );
     for( int direction=-1; direction<=1; direction +=2)
       {
       refOffset[axe] = direction;
-/*  std::cout << "refOffset: " << refOffset << std::endl;*/
       for( kernelImageIt.GoToBegin(); !kernelImageIt.IsAtEnd(); ++kernelImageIt)
         {
         IndexType idx = kernelImageIt.GetIndex();
-/*  std::cout << "idx: " << idx << std::endl;*/
         
         if( kernelImageIt.Get() )
           {
@@ -193,7 +189,6 @@ HistogramErodeImageFilter< TInputImage, TOutputImage, TKernel>
     }
     
     // search for the best axe
-/*    std::cout << "--" << axeCount << "--" << std::endl;*/
     typedef typename std::multimap<unsigned long, int, typename std::greater< unsigned long > > MapCountType;
     MapCountType invertedCount;
     for( int i=0; i<ImageDimension; i++ )
@@ -214,7 +209,6 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
                        int threadId) 
 {
-/*std::cout << "++" << axes << "--" << std::endl;*/
     
     // declare the type used to store the histogram, and instanciate the histogram
     typedef typename std::map< PixelType, unsigned long > HistogramType;
@@ -241,11 +235,6 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
     // and set the first point of the image
     outputImage->SetPixel( outputRegionForThread.GetIndex(), histogram.begin()->first );
     
-//         for( typename HistogramType::iterator mapIt = histogram.begin(); mapIt != histogram.end(); mapIt++ )
-//           {
-//           std::cout << "  " << 0.0 + mapIt->first << "-" << mapIt->second ;
-//           }
-//           std::cout << std::endl;
 
     // now move the histogram
     itk::FixedArray<short, ImageDimension> direction;
@@ -298,19 +287,26 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
             }
            }
             
-        for( typename HistogramType::iterator mapIt = histogram.begin(); mapIt != histogram.end(); mapIt++ )
+        typename HistogramType::iterator mapIt = histogram.begin();
+        while( mapIt != histogram.end() )
           {
-          // std::cout << "  " << 0.0 + mapIt->first << "-" << mapIt->second ;
           if( mapIt->second == 0 )
-            { histogram.erase(mapIt->first); } // more efficient than histogram.erase(mapIt)... strange but true
+            { 
+            // this value must be removed from the histogram
+            // The value must be stored and the iterator updated before removing the value
+            // or the iterator is invalidated.
+            PixelType toErase = mapIt->first;
+            mapIt++;
+            histogram.erase(toErase);
+            }
           else
             {
+            //mapIt++;
             // don't remove all the zero value found, just remove the one before the current maximum value
             // the histogram may become quite big on real type image, but it's an important increase of performances
             break;
             }
           }
-/*          std::cout << std::endl;*/
             
         // histogram is fully uptodate
         // get the highest value
