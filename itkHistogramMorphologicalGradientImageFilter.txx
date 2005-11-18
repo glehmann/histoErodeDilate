@@ -235,7 +235,10 @@ HistogramMorphologicalGradientImageFilter<TInputImage, TOutputImage, TKernel>
       
       }
     // and set the first point of the image
-    outputImage->SetPixel( outputRegionForThread.GetIndex(), histogram.rbegin()->first - histogram.begin()->first );
+    if( !histogram.empty() )
+      { outputImage->SetPixel( outputRegionForThread.GetIndex(), histogram.rbegin()->first - histogram.begin()->first ); }
+    else
+      { outputImage->SetPixel( outputRegionForThread.GetIndex(), 0 ); }
     progress.CompletedPixel();
     
 
@@ -313,7 +316,9 @@ HistogramMorphologicalGradientImageFilter<TInputImage, TOutputImage, TKernel>
             
         // histogram is fully uptodate
         // get the highest value
-        PixelType value = histogram.rbegin()->first - histogram.begin()->first;
+        PixelType value = 0;
+        if( !histogram.empty() )
+          { value = histogram.rbegin()->first - histogram.begin()->first; }
                     
         // store the new index
         currentIdx += offset;
