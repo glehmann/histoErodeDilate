@@ -93,6 +93,10 @@ public:
   
   itkGetMacro(PixelsPerTranslation, unsigned long);
   
+  /** Set/Get the boundary value. */
+  itkSetMacro(Boundary, PixelType);
+  itkGetMacro(Boundary, PixelType);
+  
   /** HistogramDilateImageFilter need to make sure they request enough of an
    * input image to account for the structuring element size.  The input
    * requested region is expanded by the radius of the structuring element.
@@ -128,6 +132,8 @@ private:
   typename itk::FixedArray< int, ImageDimension > m_Axes;
 
   unsigned long m_PixelsPerTranslation;
+
+  PixelType m_Boundary;
 } ; // end of class
 
 } // end namespace itk

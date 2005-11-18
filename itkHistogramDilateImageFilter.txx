@@ -33,6 +33,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
   : m_Kernel()
 {
   m_PixelsPerTranslation = 0;
+  m_Boundary = itk::NumericTraits< PixelType >::NonpositiveMin();
 }
 
 template<class TInputImage, class TOutputImage, class TKernel>
@@ -233,10 +234,9 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
       {
       IndexType idx = outputRegionForThread.GetIndex() + (*listIt);
       if( inputRegion.IsInside( idx ) )
-        {
-        histogram[inputImage->GetPixel(idx)]++;
-        }
-      
+        { histogram[inputImage->GetPixel(idx)]++; }
+      else
+        { histogram[m_Boundary]++; }
       }
     // and set the first point of the image
     outputImage->SetPixel( outputRegionForThread.GetIndex(), histogram.begin()->first );
@@ -283,6 +283,8 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
             IndexType idx = currentIdx + (*addedIt);
             if( inputRegion.IsInside( idx ) )
               { histogram[inputImage->GetPixel( idx )]++; }
+            else
+              { histogram[m_Boundary]++; }
             }
           const OffsetListType* removedList = &m_RemovedOffsets[offset];
           for( typename OffsetListType::const_iterator removedIt = removedList->begin(); removedIt != removedList->end(); removedIt++ )
@@ -290,6 +292,8 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
             IndexType idx = currentIdx + (*removedIt);
             if( inputRegion.IsInside( idx ) )
               { histogram[ inputImage->GetPixel( idx ) ]--; }
+            else
+              { histogram[m_Boundary]--; }
             }
            }
             
