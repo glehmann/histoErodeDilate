@@ -90,6 +90,10 @@ public:
   /** Get the kernel (structuring element). */
   itkGetConstReferenceMacro(Kernel, KernelType);
   
+  /** Set/Get the boundary value. */
+  itkSetMacro(Boundary, PixelType);
+  itkGetMacro(Boundary, PixelType);
+  
   /** HistogramErodeImageFilter need to make sure they request enough of an
    * input image to account for the structuring element size.  The input
    * requested region is expanded by the radius of the structuring element.
@@ -123,6 +127,8 @@ private:
   OffsetListType m_KernelOffsets;
 
   typename itk::FixedArray< int, ImageDimension > m_Axes;
+
+  PixelType m_Boundary;
 } ; // end of class
 
 } // end namespace itk

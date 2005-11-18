@@ -22,6 +22,7 @@
 #include "itkImageRegionConstIteratorWithIndex.h"
 #include "itkOffset.h"
 #include "itkProgressReporter.h"
+#include "itkNumericTraits.h"
 
 
 namespace itk {
@@ -32,6 +33,7 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
 ::HistogramErodeImageFilter()
   : m_Kernel()
 {
+  m_Boundary = itk::NumericTraits< PixelType >::max();
 }
 
 template<class TInputImage, class TOutputImage, class TKernel>
@@ -229,10 +231,9 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
       {
       IndexType idx = outputRegionForThread.GetIndex() + (*listIt);
       if( inputRegion.IsInside( idx ) )
-        {
-        histogram[inputImage->GetPixel(idx)]++;
-        }
-      
+        { histogram[inputImage->GetPixel(idx)]++; }
+      else
+        { histogram[m_Boundary]++; }
       }
     // and set the first point of the image
     outputImage->SetPixel( outputRegionForThread.GetIndex(), histogram.begin()->first );
@@ -280,6 +281,8 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
             IndexType idx = currentIdx + (*addedIt);
             if( inputRegion.IsInside( idx ) )
               { histogram[inputImage->GetPixel( idx )]++; }
+            else
+              { histogram[m_Boundary]++; }
             }
           const OffsetListType* removedList = &m_RemovedOffsets[offset];
           for( typename OffsetListType::const_iterator removedIt = removedList->begin(); removedIt != removedList->end(); removedIt++ )
@@ -287,6 +290,8 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
             IndexType idx = currentIdx + (*removedIt);
             if( inputRegion.IsInside( idx ) )
               { histogram[ inputImage->GetPixel( idx ) ]--; }
+            else
+              { histogram[m_Boundary]--; }
             }
            }
             
@@ -313,6 +318,7 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
             
         // histogram is fully uptodate
         // get the highest value
+std::cout << "size: " << histogram.size() << std::endl;
         PixelType value = histogram.begin()->first;
                     
         // store the new index
