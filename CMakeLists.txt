@@ -87,6 +87,10 @@ SET(CurrentExe "kernelException")
 ADD_EXECUTABLE(${CurrentExe} kernelException.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
+SET(CurrentExe "metaErode2D")
+ADD_EXECUTABLE(${CurrentExe} metaErode2D.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
 #the following line is an example of how to add a test to your project.
 #Testname is the title for this particular test.  ExecutableToRun is the
 #program which will be running this test.  It can either be a part of this
@@ -113,3 +117,7 @@ ADD_TEST(Gradient3D gradient3D ${CMAKE_SOURCE_DIR}/ESCells.hdr bgradient3D.tif h
 ADD_TEST(Gradient3DCompare ImageCompare bgradient3D.tif hgradient3D.tif)
 
 ADD_TEST(KernelException kernelException)
+
+ADD_TEST(MetaErode2D erode2D ${CMAKE_SOURCE_DIR}/cthead1.tif bmetaErode2D.tif hmetaErode2D.tif)
+ADD_TEST(MetaErode2DCompare ImageCompare bmetaErode2D.tif hmetaErode2D.tif)
+

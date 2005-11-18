@@ -108,13 +108,27 @@ GrayscaleErodeImageFilter< TInputImage, TOutputImage, TKernel>
 template< class TInputImage, class TOutputImage, class TKernel>
 void
 GrayscaleErodeImageFilter< TInputImage, TOutputImage, TKernel>
-::SetBoundary( PixelType value )
+::SetBoundary( const PixelType value )
 {
   m_Boundary = value;
   m_HistogramFilter->SetBoundary( value );
   
   m_BoundaryCondition.SetConstant( value );
   m_BasicFilter->OverrideBoundaryCondition( &m_BoundaryCondition );
+}
+
+template< class TInputImage, class TOutputImage, class TKernel>
+void
+GrayscaleErodeImageFilter< TInputImage, TOutputImage, TKernel>
+::SetNameOfBackendFilterClass( const char * name )
+{
+  if( strcmp( name, m_BasicFilter->GetNameOfClass() ) && strcmp( name, m_HistogramFilter->GetNameOfClass() ) )
+    { itkExceptionMacro( << "Invalid name of class." ); }
+  if( strcmp( m_NameOfBackendFilterClass, name ) )
+    {
+    m_NameOfBackendFilterClass = name;
+    this->Modified();
+    }
 }
 
 template<class TInputImage, class TOutputImage, class TKernel>
