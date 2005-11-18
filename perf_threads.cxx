@@ -40,6 +40,10 @@ int main(int, char * argv[])
   
   reader->Update();
   
+  std::cout << "#nb" << "\t" 
+            << "d" << "\t" 
+            << "hd" << std::endl;
+
   for( int t=1; t<=4; t++ )
     {
     itk::TimeProbe time;
@@ -62,7 +66,9 @@ int main(int, char * argv[])
       hdilate->Modified();
       }
       
-    std::cout << t << "\t" << time.GetMeanTime() << "\t" << htime.GetMeanTime() << std::endl;
+    std::cout << t << "\t" 
+              << time.GetMeanTime() << "\t"
+              << htime.GetMeanTime() << std::endl;
     }
   
   

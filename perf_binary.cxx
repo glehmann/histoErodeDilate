@@ -46,7 +46,11 @@ int main(int, char * argv[])
   radiusList.push_back( 50 );
   radiusList.push_back( 100 );
   
-  std::cout << "radius" << "\t" << "nb" << "\t" << "d" << "\t" << "hd" << "\t" << "bd" << std::endl;
+  std::cout << "#radius" << "\t"
+            << "nb" << "\t" 
+            << "d" << "\t" 
+            << "hd" << "\t" 
+            << "bd" << std::endl;
 
   for( std::vector< int >::iterator it=radiusList.begin(); it !=radiusList.end() ; it++)
     {
@@ -101,7 +105,11 @@ int main(int, char * argv[])
       
       }
       
-    std::cout << *it << "\t" << nbOfNeighbors << "\t" << dtime.GetMeanTime() << "\t" << hdtime.GetMeanTime() << "\t" << bdtime.GetMeanTime() << std::endl;
+    std::cout << *it << "\t"
+              << nbOfNeighbors << "\t" 
+              << dtime.GetMeanTime() << "\t" 
+              << hdtime.GetMeanTime() << "\t" 
+              << bdtime.GetMeanTime() << std::endl;
     }
   
   
