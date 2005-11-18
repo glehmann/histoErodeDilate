@@ -98,7 +98,7 @@ GrayscaleErodeImageFilter< TInputImage, TOutputImage, TKernel>
 
   m_Kernel = kernel;
   // Delegate to a dilate filter.
-  if( m_Kernel.Size() < m_HistogramFilter->GetPixelsPerTranslation() * 5.5 )
+  if( m_Kernel.Size() < m_HistogramFilter->GetPixelsPerTranslation() * 5.4 )
     { m_NameOfBackendFilterClass = m_BasicFilter->GetNameOfClass(); }
   else
     { m_NameOfBackendFilterClass = m_HistogramFilter->GetNameOfClass(); }
