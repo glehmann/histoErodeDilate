@@ -5,9 +5,12 @@
 #include "itkNeighborhood.h"
 #include "itkTimeProbe.h"
 #include <vector>
+#include "itkMultiThreader.h"
 
 int main(int, char * argv[])
 {
+  itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
+
   const int dim = 2;
   typedef unsigned char PType;
   typedef itk::Image< PType, dim >    IType;
@@ -23,12 +26,10 @@ int main(int, char * argv[])
   typedef itk::HistogramDilateImageFilter< IType, IType, SRType > HDilateType;
   HDilateType::Pointer hdilate = HDilateType::New();
   hdilate->SetInput( reader->GetOutput() );
-  hdilate->SetNumberOfThreads( 1 );
   
   typedef itk::GrayscaleDilateImageFilter< IType, IType, SRType > DilateType;
   DilateType::Pointer dilate = DilateType::New();
   dilate->SetInput( reader->GetOutput() );
-  dilate->SetNumberOfThreads( 1 );
   
 /*  // write 
   typedef itk::ImageFileWriter< IType > WriterType;

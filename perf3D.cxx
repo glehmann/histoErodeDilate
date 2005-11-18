@@ -9,9 +9,12 @@
 #include "itkBinaryBallStructuringElement.h"
 #include "itkTimeProbe.h"
 #include <vector>
+#include "itkMultiThreader.h"
 
 int main(int, char * argv[])
 {
+  itk::MultiThreader::SetGlobalMaximumNumberOfThreads(1);
+
   const int dim = 3;
   typedef unsigned char PType;
   typedef itk::Image< PType, dim >    IType;
@@ -26,32 +29,26 @@ int main(int, char * argv[])
   typedef itk::HistogramDilateImageFilter< IType, IType, SRType > HDilateType;
   HDilateType::Pointer hdilate = HDilateType::New();
   hdilate->SetInput( reader->GetOutput() );
-  hdilate->SetNumberOfThreads( 1 );
   
   typedef itk::GrayscaleDilateImageFilter< IType, IType, SRType > DilateType;
   DilateType::Pointer dilate = DilateType::New();
   dilate->SetInput( reader->GetOutput() );
-  dilate->SetNumberOfThreads( 1 );
   
   typedef itk::HistogramErodeImageFilter< IType, IType, SRType > HErodeType;
   HErodeType::Pointer herode = HErodeType::New();
   herode->SetInput( reader->GetOutput() );
-  herode->SetNumberOfThreads( 1 );
   
   typedef itk::GrayscaleErodeImageFilter< IType, IType, SRType > ErodeType;
   ErodeType::Pointer erode = ErodeType::New();
   erode->SetInput( reader->GetOutput() );
-  erode->SetNumberOfThreads( 1 );
   
   typedef itk::HistogramMorphologicalGradientImageFilter< IType, IType, SRType > HMorphologicalGradientType;
   HMorphologicalGradientType::Pointer hgradient = HMorphologicalGradientType::New();
   hgradient->SetInput( reader->GetOutput() );
-  hgradient->SetNumberOfThreads( 1 );
   
   typedef itk::MorphologicalGradientImageFilter< IType, IType, SRType > MorphologicalGradientType;
   MorphologicalGradientType::Pointer gradient = MorphologicalGradientType::New();
   gradient->SetInput( reader->GetOutput() );
-  gradient->SetNumberOfThreads( 1 );
   
   reader->Update();
   
@@ -61,7 +58,17 @@ int main(int, char * argv[])
   radiusList.push_back( 15 );
   radiusList.push_back( 20 );
   
-  std::cout << "radius" << "\t" << "nb" << "\t" << "d" << "\t" << "hd" << "\t" << "e" << "\t" << "he" << "\t" << "g" << "\t" << "hg" << std::endl;
+  std::cout << "#radius" << "\t" 
+            << "rep" << "\t" 
+            << "total" << "\t" 
+            << "nb" << "\t" 
+            << "hnb" << "\t" 
+            << "d" << "\t" 
+            << "hd" << "\t" 
+            << "e" << "\t" 
+            << "he" << "\t" 
+            << "g" << "\t" 
+            << "hg" << std::endl;
 
   for( std::vector< int >::iterator it=radiusList.begin(); it !=radiusList.end() ; it++)
     {
@@ -97,12 +104,12 @@ int main(int, char * argv[])
     hgradient->SetKernel( kernel );
 
     int nbOfRepeats;
-    if( *it <= 5 )
-      { nbOfRepeats = 10; }
-    else if( *it <= 10 )
+    if( *it <= 3 )
       { nbOfRepeats = 5; }
-    else
+    else if( *it <= 5 )
       { nbOfRepeats = 2; }
+    else
+      { nbOfRepeats = 1; }
     //nbOfRepeats = 1;
 
     for( int i=0; i<nbOfRepeats; i++ )
@@ -135,7 +142,17 @@ int main(int, char * argv[])
       hgradient->Modified();
       }
       
-    std::cout << *it << "\t" << nbOfNeighbors << "\t" << dtime.GetMeanTime() << "\t" << hdtime.GetMeanTime() << "\t" << etime.GetMeanTime() << "\t" << hetime.GetMeanTime()<< "\t" << gtime.GetMeanTime() << "\t" << hgtime.GetMeanTime() << std::endl;
+    std::cout << *it << "\t" 
+              << nbOfRepeats << "\t" 
+              << (*it*2+1)*(*it*2+1)*(*it*2+1) << "\t" 
+              << nbOfNeighbors << "\t"
+              << hdilate->GetPixelsPerTranslation() << "\t" 
+              << dtime.GetMeanTime() << "\t" 
+              << hdtime.GetMeanTime() << "\t" 
+              << etime.GetMeanTime() << "\t" 
+              << hetime.GetMeanTime()<< "\t" 
+              << gtime.GetMeanTime() << "\t" 
+              << hgtime.GetMeanTime() << std::endl;
     }
   
   
