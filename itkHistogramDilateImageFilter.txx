@@ -92,16 +92,6 @@ void
 HistogramDilateImageFilter< TInputImage, TOutputImage, TKernel>
 ::SetKernel( const KernelType& kernel )
 {
-  // store the kernel !!
-  m_Kernel = kernel;
-
-  // clear the already stored values
-  m_AddedOffsets.clear();
-  m_RemovedOffsets.clear();
-  m_KernelOffsets.clear();
-  //m_Axes
-  //m_PixelsPerTranslation
-
   // first, build the list of offsets of added and removed pixels when the 
   // structuring element move of 1 pixel on 1 axe; do it for the 2 directions
   // on each axes.
@@ -110,35 +100,52 @@ HistogramDilateImageFilter< TInputImage, TOutputImage, TKernel>
   // access to the data
   typedef Image< bool, TInputImage::ImageDimension > BoolImageType;
   typename BoolImageType::Pointer tmpSEImage = BoolImageType::New();
-  tmpSEImage->SetRegions( m_Kernel.GetSize() );
+  tmpSEImage->SetRegions( kernel.GetSize() );
   tmpSEImage->Allocate();
   RegionType tmpSEImageRegion = tmpSEImage->GetRequestedRegion();
   ImageRegionIteratorWithIndex<BoolImageType> kernelImageIt;
   kernelImageIt = ImageRegionIteratorWithIndex<BoolImageType>(tmpSEImage, tmpSEImageRegion);
   kernelImageIt.GoToBegin();
-  KernelIteratorType kernel_it = m_Kernel.Begin();
+  KernelIteratorType kernel_it = kernel.Begin();
+  OffsetListType kernelOffsets;
 
   // create a center index to compute the offset
   IndexType centerIndex;
   for( int axe=0; axe<ImageDimension; axe++)
-    { centerIndex[axe] = m_Kernel.GetSize()[axe] / 2; }
+    { centerIndex[axe] = kernel.GetSize()[axe] / 2; }
   
+  unsigned long count = 0;
   while( !kernelImageIt.IsAtEnd() )
     {
     kernelImageIt.Set( *kernel_it > 0 );
     if( *kernel_it > 0 )
       {
       kernelImageIt.Set( true );
-      m_KernelOffsets.push_front( kernelImageIt.GetIndex() - centerIndex );
+      kernelOffsets.push_front( kernelImageIt.GetIndex() - centerIndex );
+      count++;
       }
     else
-      {
-      kernelImageIt.Set( false );
-      }
+      { kernelImageIt.Set( false ); }
     ++kernelImageIt;
     ++kernel_it;
     }
     
+
+  // verify that the kernel contain at least one point
+  if( count == 0 )
+    { itkExceptionMacro( << "The kernel must contain at least one point." ); }
+
+  // no attribute should be modified before here to avoid setting the filter in a bad status
+  // store the kernel !!
+  m_Kernel = kernel;
+
+  // clear the already stored values
+  m_AddedOffsets.clear();
+  m_RemovedOffsets.clear();
+  //m_Axes
+
+  // store the kernel offset list
+  m_KernelOffsets = kernelOffsets;
 
   typename itk::FixedArray< unsigned long, ImageDimension > axeCount;
   axeCount.Fill( 0 );
@@ -263,7 +270,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
       offset[m_Axes[axe]] = direction[m_Axes[axe]];
       if( outputRegionForThread.IsInside( currentIdx + offset ) )
         {
-        stRegion.SetIndex( currentIdx + offset - centerOffset );
+/*        stRegion.SetIndex( currentIdx + offset - centerOffset );
         if( inputRegion.IsInside( stRegion ) )
           {
           // update the histogram
@@ -275,7 +282,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
             { histogram[ inputImage->GetPixel( currentIdx + (*removedIt) ) ]--; }
           }
         else
-          {
+          {*/
           // update the histogram
           const OffsetListType* addedList = &m_AddedOffsets[offset];
           for( typename OffsetListType::const_iterator addedIt = addedList->begin(); addedIt != addedList->end(); addedIt++ )
@@ -295,7 +302,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
             else
               { histogram[m_Boundary]--; }
             }
-           }
+/*           }*/
             
         typename HistogramType::iterator mapIt = histogram.begin();
         while( mapIt != histogram.end() )

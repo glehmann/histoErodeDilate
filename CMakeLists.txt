@@ -83,6 +83,10 @@ SET(CurrentExe "gradient3D")
 ADD_EXECUTABLE(${CurrentExe} gradient3D.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
+SET(CurrentExe "kernelException")
+ADD_EXECUTABLE(${CurrentExe} kernelException.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
 #the following line is an example of how to add a test to your project.
 #Testname is the title for this particular test.  ExecutableToRun is the
 #program which will be running this test.  It can either be a part of this
@@ -108,3 +112,4 @@ ADD_TEST(Gradient2DCompare ImageCompare gradient2d.tif hgradient2d.tif)
 ADD_TEST(Gradient3D gradient3D ${CMAKE_SOURCE_DIR}/ESCells.hdr gradient3d.tif hgradient3d.tif)
 ADD_TEST(Gradient3DCompare ImageCompare gradient3d.tif hgradient3d.tif)
 
+ADD_TEST(KernelException kernelException)
