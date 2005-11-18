@@ -321,7 +321,6 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
             
         // histogram is fully uptodate
         // get the highest value
-std::cout << "size: " << histogram.size() << std::endl;
         PixelType value = histogram.begin()->first;
                     
         // store the new index
