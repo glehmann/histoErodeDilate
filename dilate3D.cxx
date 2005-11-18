@@ -2,9 +2,10 @@
 #include "itkImageFileWriter.h"
 #include "itkHistogramDilateImageFilter.h"
 #include "itkGrayscaleDilateImageFilter.h"
-#include "itkBinaryBallStructuringElement.h"
+#include "itkNeighborhood.h"
 #include "itkTimeProbe.h"
 #include <vector>
+#include "itkCommand.h"
 
 template < class TFilter >
 class ProgressCallback : public itk::Command
@@ -55,10 +56,14 @@ int main(int, char * argv[])
   ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName( argv[1] );
   
-  typedef itk::BinaryBallStructuringElement< PType, dim > SRType;
+  typedef itk::Neighborhood<PType, dim> SRType;
   SRType kernel;
-  kernel.SetRadius( 2 );
-  kernel.CreateStructuringElement();
+  kernel.SetRadius( 1 );
+  for( SRType::Iterator kit=kernel.Begin(); kit!=kernel.End(); kit++ )
+    {
+    *kit = 0;
+    }
+  *kernel.Begin() = 1;
   
   typedef itk::HistogramDilateImageFilter< IType, IType, SRType > DilateType;
   DilateType::Pointer hdilate = DilateType::New();

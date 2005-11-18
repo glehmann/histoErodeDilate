@@ -2,7 +2,7 @@
 #include "itkImageFileWriter.h"
 #include "itkHistogramErodeImageFilter.h"
 #include "itkGrayscaleErodeImageFilter.h"
-#include "itkBinaryBallStructuringElement.h"
+#include "itkNeighborhood.h"
 #include "itkTimeProbe.h"
 #include <vector>
 
@@ -55,10 +55,14 @@ int main(int, char * argv[])
   ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName( argv[1] );
   
-  typedef itk::BinaryBallStructuringElement< PType, dim > SRType;
+  typedef itk::Neighborhood<PType, dim> SRType;
   SRType kernel;
   kernel.SetRadius( 10 );
-  kernel.CreateStructuringElement();
+  for( SRType::Iterator kit=kernel.Begin(); kit!=kernel.End(); kit++ )
+    {
+    *kit = 0;
+    }
+  *kernel.Begin() = 1;
   
   typedef itk::HistogramErodeImageFilter< IType, IType, SRType > ErodeType;
   ErodeType::Pointer herode = ErodeType::New();
