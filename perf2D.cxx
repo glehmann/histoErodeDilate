@@ -1,11 +1,15 @@
 #include "itkImageFileReader.h"
-#include "itkImageFileWriter.h"
+
 #include "itkHistogramDilateImageFilter.h"
 #include "itkBasicDilateImageFilter.h"
+
 #include "itkHistogramErodeImageFilter.h"
 #include "itkBasicErodeImageFilter.h"
+#include "itkGrayscaleErodeImageFilter.h"
+
 #include "itkHistogramMorphologicalGradientImageFilter.h"
 #include "itkMorphologicalGradientImageFilter.h"
+
 #include "itkBinaryBallStructuringElement.h"
 #include "itkTimeProbe.h"
 #include <vector>
@@ -38,7 +42,11 @@ int main(int, char * argv[])
   HErodeType::Pointer herode = HErodeType::New();
   herode->SetInput( reader->GetOutput() );
   
-  typedef itk::BasicErodeImageFilter< IType, IType, SRType > ErodeType;
+  typedef itk::BasicErodeImageFilter< IType, IType, SRType > BErodeType;
+  BErodeType::Pointer berode = BErodeType::New();
+  berode->SetInput( reader->GetOutput() );
+  
+  typedef itk::GrayscaleErodeImageFilter< IType, IType, SRType > ErodeType;
   ErodeType::Pointer erode = ErodeType::New();
   erode->SetInput( reader->GetOutput() );
   
@@ -68,8 +76,9 @@ int main(int, char * argv[])
             << "hnb" << "\t" 
             << "d" << "\t" 
             << "hd" << "\t" 
-            << "e" << "\t" 
+            << "be" << "\t" 
             << "he" << "\t" 
+            << "e" << "\t" 
             << "g" << "\t" 
             << "hg" << std::endl;
 
@@ -80,6 +89,7 @@ int main(int, char * argv[])
 
     itk::TimeProbe etime;
     itk::TimeProbe hetime;
+    itk::TimeProbe betime;
   
     itk::TimeProbe gtime;
     itk::TimeProbe hgtime;
@@ -101,6 +111,7 @@ int main(int, char * argv[])
     hdilate->SetKernel( kernel );
     
     erode->SetKernel( kernel );
+    berode->SetKernel( kernel );
     herode->SetKernel( kernel );
     
     gradient->SetKernel( kernel );
@@ -136,6 +147,10 @@ int main(int, char * argv[])
       herode->Update();
       hetime.Stop();
       herode->Modified();
+      betime.Start();
+      berode->Update();
+      betime.Stop();
+      berode->Modified();
       
       gtime.Start();
       gradient->Update();
@@ -154,10 +169,13 @@ int main(int, char * argv[])
               << hdilate->GetPixelsPerTranslation() << "\t" 
               << dtime.GetMeanTime() << "\t" 
               << hdtime.GetMeanTime() << "\t" 
-              << etime.GetMeanTime() << "\t" 
+              << betime.GetMeanTime() << "\t" 
               << hetime.GetMeanTime()<< "\t" 
+              << etime.GetMeanTime()<< "\t" 
               << gtime.GetMeanTime() << "\t" 
-              << hgtime.GetMeanTime() << std::endl;
+              << hgtime.GetMeanTime() << "\t"
+//<< erode->GetNameOfBackendFilterClass()
+              <<std::endl;
     }
   
   
