@@ -94,22 +94,22 @@ TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 #for this test.  Include as many tests as you like.  If your project doesn't have
 #any tests you can comment out or delete the following line.
 
-ADD_TEST(Dilate2D dilate2D ${CMAKE_SOURCE_DIR}/cthead1.tif dilate2D.tif hdilate2D.tif)
-ADD_TEST(Dilate2DCompare ImageCompare dilate2D.tif hdilate2D.tif)
+ADD_TEST(Dilate2D dilate2D ${CMAKE_SOURCE_DIR}/cthead1.tif bdilate2D.tif hdilate2D.tif)
+ADD_TEST(Dilate2DCompare ImageCompare bdilate2D.tif hdilate2D.tif)
 
-ADD_TEST(Dilate3D dilate3D ${CMAKE_SOURCE_DIR}/ESCells.hdr dilate3D.tif hdilate3D.tif)
-ADD_TEST(Dilate3DCompare ImageCompare dilate3D.tif hdilate3D.tif)
+ADD_TEST(Dilate3D dilate3D ${CMAKE_SOURCE_DIR}/ESCells.hdr bdilate3D.tif hdilate3D.tif)
+ADD_TEST(Dilate3DCompare ImageCompare bdilate3D.tif hdilate3D.tif)
 
-ADD_TEST(Erode2D erode2D ${CMAKE_SOURCE_DIR}/cthead1.tif erode2D.tif herode2D.tif)
-ADD_TEST(Erode2DCompare ImageCompare erode2D.tif herode2D.tif)
+ADD_TEST(Erode2D erode2D ${CMAKE_SOURCE_DIR}/cthead1.tif berode2D.tif herode2D.tif)
+ADD_TEST(Erode2DCompare ImageCompare berode2D.tif herode2D.tif)
 
-ADD_TEST(Erode3D erode3D ${CMAKE_SOURCE_DIR}/ESCells.hdr erode3D.tif herode3D.tif)
-ADD_TEST(Erode3DCompare ImageCompare erode3D.tif herode3D.tif)
+ADD_TEST(Erode3D erode3D ${CMAKE_SOURCE_DIR}/ESCells.hdr berode3D.tif herode3D.tif)
+ADD_TEST(Erode3DCompare ImageCompare berode3D.tif herode3D.tif)
 
-ADD_TEST(Gradient2D gradient2D ${CMAKE_SOURCE_DIR}/cthead1.tif gradient2D.tif hgradient2D.tif)
-ADD_TEST(Gradient2DCompare ImageCompare gradient2D.tif hgradient2D.tif)
+ADD_TEST(Gradient2D gradient2D ${CMAKE_SOURCE_DIR}/cthead1.tif bgradient2D.tif hgradient2D.tif)
+ADD_TEST(Gradient2DCompare ImageCompare bgradient2D.tif hgradient2D.tif)
 
-ADD_TEST(Gradient3D gradient3D ${CMAKE_SOURCE_DIR}/ESCells.hdr gradient3D.tif hgradient3D.tif)
-ADD_TEST(Gradient3DCompare ImageCompare gradient3D.tif hgradient3D.tif)
+ADD_TEST(Gradient3D gradient3D ${CMAKE_SOURCE_DIR}/ESCells.hdr bgradient3D.tif hgradient3D.tif)
+ADD_TEST(Gradient3DCompare ImageCompare bgradient3D.tif hgradient3D.tif)
 
 ADD_TEST(KernelException kernelException)
