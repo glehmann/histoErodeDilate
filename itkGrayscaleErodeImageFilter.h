@@ -20,6 +20,7 @@
 #include "itkImageToImageFilter.h"
 #include "itkHistogramErodeImageFilter.h"
 #include "itkGrayscaleErodeImageFilter.h"
+#include "itkConstantBoundaryCondition.h"
 
 namespace itk {
 
@@ -83,7 +84,7 @@ public:
   itkGetConstReferenceMacro(Kernel, KernelType);
   
   /** Set/Get the boundary value. */
-  itkSetMacro(Boundary, PixelType);
+  void SetBoundary( PixelType value );
   itkGetMacro(Boundary, PixelType);
   
   itkGetMacro(NameOfBackendFilterClass, const char*);
@@ -120,6 +121,9 @@ private:
 
   // and the name of the filter
   const char* m_NameOfBackendFilterClass;
+
+  // the boundary condition need to be stored here
+  typename itk::ConstantBoundaryCondition< TInputImage > m_BoundaryCondition;
   
 } ; // end of class
 

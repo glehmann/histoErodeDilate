@@ -22,7 +22,6 @@
 #include "itkProgressAccumulator.h"
 #include <string>
 
-
 namespace itk {
 
 
@@ -33,8 +32,9 @@ GrayscaleErodeImageFilter<TInputImage, TOutputImage, TKernel>
 {
   m_BasicFilter = BasicFilterType::New();
   m_HistogramFilter = HistogramFilterType::New();
-  m_Boundary = itk::NumericTraits< PixelType >::max();
   m_NameOfBackendFilterClass = m_HistogramFilter->GetNameOfClass();
+
+  this->SetBoundary( itk::NumericTraits< PixelType >::max() );
 }
 
 template<class TInputImage, class TOutputImage, class TKernel>
@@ -105,6 +105,18 @@ GrayscaleErodeImageFilter< TInputImage, TOutputImage, TKernel>
 
 }
 
+template< class TInputImage, class TOutputImage, class TKernel>
+void
+GrayscaleErodeImageFilter< TInputImage, TOutputImage, TKernel>
+::SetBoundary( PixelType value )
+{
+  m_Boundary = value;
+  m_HistogramFilter->SetBoundary( value );
+  
+  m_BoundaryCondition.SetConstant( value );
+  m_BasicFilter->OverrideBoundaryCondition( &m_BoundaryCondition );
+}
+
 template<class TInputImage, class TOutputImage, class TKernel>
 void
 GrayscaleErodeImageFilter<TInputImage, TOutputImage, TKernel>
@@ -157,6 +169,8 @@ GrayscaleErodeImageFilter<TInputImage, TOutputImage, TKernel>
   Superclass::PrintSelf(os, indent);
 
   os << indent << "Kernel: " << m_Kernel << std::endl;
+  os << indent << "Boundary: " <<  static_cast<typename NumericTraits<PixelType>::PrintType>( m_Boundary ) << std::endl;
+  os << indent << "NameOfBackendFilterClass: " << m_NameOfBackendFilterClass << std::endl;
 }
 
 }// end namespace itk
