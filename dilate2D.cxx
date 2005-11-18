@@ -1,7 +1,7 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkHistogramDilateImageFilter.h"
-#include "itkGrayscaleDilateImageFilter.h"
+#include "itkBasicDilateImageFilter.h"
 #include "itkNeighborhood.h"
 #include "itkTimeProbe.h"
 #include <vector>
@@ -74,7 +74,7 @@ int main(int, char * argv[])
   ProgressType::Pointer progress = ProgressType::New();
   progress->SetFilter(hdilate);
 
-  typedef itk::GrayscaleDilateImageFilter< IType, IType, SRType > HDilateType;
+  typedef itk::BasicDilateImageFilter< IType, IType, SRType > HDilateType;
   HDilateType::Pointer dilate = HDilateType::New();
   dilate->SetInput( reader->GetOutput() );
   dilate->SetKernel( kernel );

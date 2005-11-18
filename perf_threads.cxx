@@ -1,7 +1,7 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkHistogramDilateImageFilter.h"
-#include "itkGrayscaleDilateImageFilter.h"
+#include "itkBasicDilateImageFilter.h"
 #include "itkBinaryBallStructuringElement.h"
 #include "itkTimeProbe.h"
 #include <vector>
@@ -27,7 +27,7 @@ int main(int, char * argv[])
   hdilate->SetInput( reader->GetOutput() );
   hdilate->SetKernel( kernel );
   
-  typedef itk::GrayscaleDilateImageFilter< IType, IType, SRType > DilateType;
+  typedef itk::BasicDilateImageFilter< IType, IType, SRType > DilateType;
   DilateType::Pointer dilate = DilateType::New();
   dilate->SetInput( reader->GetOutput() );
   dilate->SetKernel( kernel );

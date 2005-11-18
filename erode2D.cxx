@@ -1,7 +1,7 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkHistogramErodeImageFilter.h"
-#include "itkGrayscaleErodeImageFilter.h"
+#include "itkBasicErodeImageFilter.h"
 #include "itkNeighborhood.h"
 #include "itkTimeProbe.h"
 #include <vector>
@@ -73,7 +73,7 @@ int main(int, char * argv[])
   ProgressType::Pointer progress = ProgressType::New();
   progress->SetFilter(herode);
 
-  typedef itk::GrayscaleErodeImageFilter< IType, IType, SRType > HErodeType;
+  typedef itk::BasicErodeImageFilter< IType, IType, SRType > HErodeType;
   HErodeType::Pointer erode = HErodeType::New();
   erode->SetInput( reader->GetOutput() );
   erode->SetKernel( kernel );

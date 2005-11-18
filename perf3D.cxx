@@ -1,9 +1,9 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkHistogramDilateImageFilter.h"
-#include "itkGrayscaleDilateImageFilter.h"
+#include "itkBasicDilateImageFilter.h"
 #include "itkHistogramErodeImageFilter.h"
-#include "itkGrayscaleErodeImageFilter.h"
+#include "itkBasicErodeImageFilter.h"
 #include "itkHistogramMorphologicalGradientImageFilter.h"
 #include "itkMorphologicalGradientImageFilter.h"
 #include "itkBinaryBallStructuringElement.h"
@@ -30,7 +30,7 @@ int main(int, char * argv[])
   HDilateType::Pointer hdilate = HDilateType::New();
   hdilate->SetInput( reader->GetOutput() );
   
-  typedef itk::GrayscaleDilateImageFilter< IType, IType, SRType > DilateType;
+  typedef itk::BasicDilateImageFilter< IType, IType, SRType > DilateType;
   DilateType::Pointer dilate = DilateType::New();
   dilate->SetInput( reader->GetOutput() );
   
@@ -38,7 +38,7 @@ int main(int, char * argv[])
   HErodeType::Pointer herode = HErodeType::New();
   herode->SetInput( reader->GetOutput() );
   
-  typedef itk::GrayscaleErodeImageFilter< IType, IType, SRType > ErodeType;
+  typedef itk::BasicErodeImageFilter< IType, IType, SRType > ErodeType;
   ErodeType::Pointer erode = ErodeType::New();
   erode->SetInput( reader->GetOutput() );
   
