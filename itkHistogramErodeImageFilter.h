@@ -90,6 +90,8 @@ public:
   /** Get the kernel (structuring element). */
   itkGetConstReferenceMacro(Kernel, KernelType);
   
+  itkGetMacro(PixelsPerTranslation, unsigned long);
+  
   /** Set/Get the boundary value. */
   itkSetMacro(Boundary, PixelType);
   itkGetMacro(Boundary, PixelType);
@@ -127,6 +129,8 @@ private:
   OffsetListType m_KernelOffsets;
 
   typename itk::FixedArray< int, ImageDimension > m_Axes;
+
+  unsigned long m_PixelsPerTranslation;
 
   PixelType m_Boundary;
 } ; // end of class

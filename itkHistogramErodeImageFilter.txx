@@ -33,6 +33,7 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
 ::HistogramErodeImageFilter()
   : m_Kernel()
 {
+  m_PixelsPerTranslation = 0;
   m_Boundary = itk::NumericTraits< PixelType >::max();
 }
 
@@ -204,6 +205,8 @@ HistogramErodeImageFilter< TInputImage, TOutputImage, TKernel>
       {
       m_Axes[i] = it->second;
       }
+
+    m_PixelsPerTranslation = axeCount[m_Axes[ImageDimension - 1]] / 2;  // divided by 2 because there is 2 direction on the axe
 }
 
 template<class TInputImage, class TOutputImage, class TKernel>
