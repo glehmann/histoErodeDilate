@@ -1,7 +1,7 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkHistogramMorphologicalGradientImageFilter.h"
-#include "itkMorphologicalGradientImageFilter.h"
+#include "itkBasicMorphologicalGradientImageFilter.h"
 #include "itkNeighborhood.h"
 #include "itkTimeProbe.h"
 #include <vector>
@@ -73,7 +73,7 @@ int main(int, char * argv[])
   ProgressType::Pointer progress = ProgressType::New();
   progress->SetFilter(hgradient);
 
-  typedef itk::MorphologicalGradientImageFilter< IType, IType, SRType > HMorphologicalGradientType;
+  typedef itk::BasicMorphologicalGradientImageFilter< IType, IType, SRType > HMorphologicalGradientType;
   HMorphologicalGradientType::Pointer gradient = HMorphologicalGradientType::New();
   gradient->SetInput( reader->GetOutput() );
   gradient->SetKernel( kernel );
