@@ -65,29 +65,29 @@ int main(int, char * argv[])
   *kernel.Begin() = 1;
   
   typedef itk::GrayscaleDilateImageFilter< IType, IType, SRType > DilateType;
-  DilateType::Pointer erode = DilateType::New();
-  erode->SetInput( reader->GetOutput() );
-  erode->SetKernel( kernel );
+  DilateType::Pointer dilate = DilateType::New();
+  dilate->SetInput( reader->GetOutput() );
+  dilate->SetKernel( kernel );
   
   typedef ProgressCallback< DilateType > ProgressType;
   ProgressType::Pointer progress = ProgressType::New();
-  progress->SetFilter(erode);
+  progress->SetFilter(dilate);
 
   typedef itk::ImageFileWriter< IType > WriterType;
   WriterType::Pointer writer = WriterType::New();
-  writer->SetInput( erode->GetOutput() );
+  writer->SetInput( dilate->GetOutput() );
 
-  erode->SetNameOfBackendFilterClass("BasicDilateImageFilter");
+  dilate->SetNameOfBackendFilterClass("BasicDilateImageFilter");
   writer->SetFileName( argv[2] );
   writer->Update();
   
-  erode->SetNameOfBackendFilterClass("HistogramDilateImageFilter");
+  dilate->SetNameOfBackendFilterClass("HistogramDilateImageFilter");
   writer->SetFileName( argv[3] );
   writer->Update();
   
   try
     {
-    erode->SetNameOfBackendFilterClass("a wrong class name");
+    dilate->SetNameOfBackendFilterClass("a wrong class name");
     return EXIT_FAILURE;
     }
   catch (itk::ExceptionObject & e)
