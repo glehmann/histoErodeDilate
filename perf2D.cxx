@@ -2,6 +2,7 @@
 
 #include "itkHistogramDilateImageFilter.h"
 #include "itkBasicDilateImageFilter.h"
+#include "itkGrayscaleDilateImageFilter.h"
 
 #include "itkHistogramErodeImageFilter.h"
 #include "itkBasicErodeImageFilter.h"
@@ -34,9 +35,14 @@ int main(int, char * argv[])
   HDilateType::Pointer hdilate = HDilateType::New();
   hdilate->SetInput( reader->GetOutput() );
   
-  typedef itk::BasicDilateImageFilter< IType, IType, SRType > DilateType;
+  typedef itk::BasicDilateImageFilter< IType, IType, SRType > BDilateType;
+  BDilateType::Pointer bdilate = BDilateType::New();
+  bdilate->SetInput( reader->GetOutput() );
+  
+  typedef itk::GrayscaleDilateImageFilter< IType, IType, SRType > DilateType;
   DilateType::Pointer dilate = DilateType::New();
   dilate->SetInput( reader->GetOutput() );
+
   
   typedef itk::HistogramErodeImageFilter< IType, IType, SRType > HErodeType;
   HErodeType::Pointer herode = HErodeType::New();
@@ -49,6 +55,7 @@ int main(int, char * argv[])
   typedef itk::GrayscaleErodeImageFilter< IType, IType, SRType > ErodeType;
   ErodeType::Pointer erode = ErodeType::New();
   erode->SetInput( reader->GetOutput() );
+
   
   typedef itk::HistogramMorphologicalGradientImageFilter< IType, IType, SRType > HMorphologicalGradientType;
   HMorphologicalGradientType::Pointer hgradient = HMorphologicalGradientType::New();
@@ -74,8 +81,9 @@ int main(int, char * argv[])
             << "total" << "\t" 
             << "nb" << "\t" 
             << "hnb" << "\t" 
-            << "d" << "\t" 
+            << "bd" << "\t" 
             << "hd" << "\t" 
+            << "d" << "\t" 
             << "be" << "\t" 
             << "he" << "\t" 
             << "e" << "\t" 
@@ -85,6 +93,7 @@ int main(int, char * argv[])
   for( std::vector< int >::iterator it=radiusList.begin(); it !=radiusList.end() ; it++)
     {
     itk::TimeProbe dtime;
+    itk::TimeProbe bdtime;
     itk::TimeProbe hdtime;
 
     itk::TimeProbe etime;
@@ -108,6 +117,7 @@ int main(int, char * argv[])
 
   
     dilate->SetKernel( kernel );
+    bdilate->SetKernel( kernel );
     hdilate->SetKernel( kernel );
     
     erode->SetKernel( kernel );
@@ -134,6 +144,10 @@ int main(int, char * argv[])
       dilate->Update();
       dtime.Stop();
       dilate->Modified();
+      bdtime.Start();
+      bdilate->Update();
+      bdtime.Stop();
+      bdilate->Modified();
       hdtime.Start();
       hdilate->Update();
       hdtime.Stop();
@@ -167,8 +181,9 @@ int main(int, char * argv[])
               << (*it*2+1)*(*it*2+1) << "\t" 
               << nbOfNeighbors << "\t"
               << hdilate->GetPixelsPerTranslation() << "\t" 
-              << dtime.GetMeanTime() << "\t" 
+              << bdtime.GetMeanTime() << "\t" 
               << hdtime.GetMeanTime() << "\t" 
+              << dtime.GetMeanTime() << "\t" 
               << betime.GetMeanTime() << "\t" 
               << hetime.GetMeanTime()<< "\t" 
               << etime.GetMeanTime()<< "\t" 
