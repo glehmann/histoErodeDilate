@@ -9,6 +9,7 @@
 #include "itkGrayscaleErodeImageFilter.h"
 
 #include "itkHistogramMorphologicalGradientImageFilter.h"
+#include "itkBasicMorphologicalGradientImageFilter.h"
 #include "itkMorphologicalGradientImageFilter.h"
 
 #include "itkBinaryBallStructuringElement.h"
@@ -65,6 +66,10 @@ int main(int, char * argv[])
   MorphologicalGradientType::Pointer gradient = MorphologicalGradientType::New();
   gradient->SetInput( reader->GetOutput() );
   
+  typedef itk::BasicMorphologicalGradientImageFilter< IType, IType, SRType > BMorphologicalGradientType;
+  BMorphologicalGradientType::Pointer bgradient = BMorphologicalGradientType::New();
+  bgradient->SetInput( reader->GetOutput() );
+  
   reader->Update();
   
   std::vector< int > radiusList;
@@ -87,8 +92,10 @@ int main(int, char * argv[])
             << "be" << "\t" 
             << "he" << "\t" 
             << "e" << "\t" 
+            << "bg" << "\t" 
+            << "hg" << "\t" 
             << "g" << "\t" 
-            << "hg" << std::endl;
+            << std::endl;
 
   for( std::vector< int >::iterator it=radiusList.begin(); it !=radiusList.end() ; it++)
     {
@@ -101,6 +108,7 @@ int main(int, char * argv[])
     itk::TimeProbe betime;
   
     itk::TimeProbe gtime;
+    itk::TimeProbe bgtime;
     itk::TimeProbe hgtime;
   
     SRType kernel;
@@ -125,6 +133,7 @@ int main(int, char * argv[])
     herode->SetKernel( kernel );
     
     gradient->SetKernel( kernel );
+    bgradient->SetKernel( kernel );
     hgradient->SetKernel( kernel );
 
     int nbOfRepeats;
@@ -170,6 +179,10 @@ int main(int, char * argv[])
       gradient->Update();
       gtime.Stop();
       gradient->Modified();
+      bgtime.Start();
+      bgradient->Update();
+      bgtime.Stop();
+      bgradient->Modified();
       hgtime.Start();
       hgradient->Update();
       hgtime.Stop();
@@ -187,8 +200,9 @@ int main(int, char * argv[])
               << betime.GetMeanTime() << "\t" 
               << hetime.GetMeanTime()<< "\t" 
               << etime.GetMeanTime()<< "\t" 
-              << gtime.GetMeanTime() << "\t" 
+              << bgtime.GetMeanTime() << "\t" 
               << hgtime.GetMeanTime() << "\t"
+              << gtime.GetMeanTime() << "\t" 
 //<< erode->GetNameOfBackendFilterClass()
               <<std::endl;
     }
