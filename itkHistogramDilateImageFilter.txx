@@ -246,7 +246,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
         { histogram[m_Boundary]++; }
       }
     // and set the first point of the image
-    outputImage->SetPixel( outputRegionForThread.GetIndex(), histogram.begin()->first );
+    outputImage->SetPixel( outputRegionForThread.GetIndex(), static_cast< OutputPixelType >( histogram.begin()->first ) );
     progress.CompletedPixel();
 
     // now move the histogram
@@ -327,7 +327,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
             
         // histogram is fully uptodate
         // get the highest value
-        PixelType value = histogram.begin()->first;
+        OutputPixelType value = static_cast< OutputPixelType >( histogram.begin()->first );
                     
         // store the new index
         currentIdx += offset;

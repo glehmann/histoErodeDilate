@@ -66,6 +66,7 @@ public:
   typedef typename TInputImage::PixelType PixelType ;
   typedef typename TInputImage::OffsetType OffsetType ;
   typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
+  typedef typename TOutputImage::PixelType OutputPixelType ;
   
   /** Image related typedefs. */
   itkStaticConstMacro(ImageDimension, unsigned int,
