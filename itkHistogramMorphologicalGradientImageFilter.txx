@@ -199,7 +199,7 @@ HistogramMorphologicalGradientImageFilter< TInputImage, TOutputImage, TKernel>
     }
     
     // search for the best axe
-    typedef typename std::multimap<unsigned long, int, typename std::greater< unsigned long > > MapCountType;
+    typedef typename std::multimap<unsigned long, int, typename std::greater< PixelType > > MapCountType;
     MapCountType invertedCount;
     for( int i=0; i<ImageDimension; i++ )
       {

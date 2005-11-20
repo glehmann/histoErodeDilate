@@ -225,7 +225,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
     ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels());
     
     // declare the type used to store the histogram, and instanciate the histogram
-    typedef typename std::map< PixelType, unsigned long, typename std::greater< unsigned long > > HistogramType;
+    typedef typename std::map< PixelType, unsigned long, typename std::greater< PixelType > > HistogramType;
     HistogramType histogram;
     
 /*    typedef ImageRegionIteratorWithIndex< OutputImageType > OutputIteratorType;
