@@ -1,5 +1,5 @@
-#ifndef __itkIndexLexicographicCompare_h
-#define __itkIndexLexicographicCompare_h
+#ifndef __itkOffsetLexicographicCompare_h
+#define __itkOffsetLexicographicCompare_h
 
 namespace itk {
 

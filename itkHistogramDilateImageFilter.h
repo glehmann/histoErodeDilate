@@ -20,7 +20,7 @@
 #include "itkImageToImageFilter.h"
 #include <list>
 #include <map>
-#include "itkIndexLexicographicCompare.h"
+#include "itkOffsetLexicographicCompare.h"
 
 namespace itk {
 
