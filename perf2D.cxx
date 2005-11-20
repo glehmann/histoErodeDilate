@@ -73,7 +73,7 @@ int main(int, char * argv[])
   reader->Update();
   
   std::vector< int > radiusList;
-  for( int s=1; s<=10; s++)
+  for( int s=0; s<=10; s++)
     { radiusList.push_back( s ); }
   for( int s=15; s<=30; s+=5)
     { radiusList.push_back( s ); }
