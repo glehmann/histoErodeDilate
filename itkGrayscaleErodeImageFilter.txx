@@ -122,11 +122,14 @@ void
 GrayscaleErodeImageFilter< TInputImage, TOutputImage, TKernel>
 ::SetNameOfBackendFilterClass( const char * name )
 {
-  if( strcmp( name, m_BasicFilter->GetNameOfClass() ) && strcmp( name, m_HistogramFilter->GetNameOfClass() ) )
-    { itkExceptionMacro( << "Invalid name of class." ); }
   if( strcmp( m_NameOfBackendFilterClass, name ) )
     {
-    m_NameOfBackendFilterClass = name;
+    if( !strcmp( name, m_BasicFilter->GetNameOfClass() ) )
+      { m_NameOfBackendFilterClass = m_BasicFilter->GetNameOfClass(); }
+    else if( !strcmp( name, m_HistogramFilter->GetNameOfClass() ) )
+      { m_NameOfBackendFilterClass = m_HistogramFilter->GetNameOfClass(); }
+    else
+      { itkExceptionMacro( << "Invalid name of class." ); }
     this->Modified();
     }
 }
