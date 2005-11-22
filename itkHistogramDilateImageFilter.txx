@@ -337,8 +337,8 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
           // the axe must be the last one
           axe = ImageDimension - 1;
           offset[m_Axes[axe]] = direction[m_Axes[axe]];
-/*          addedList = &m_AddedOffsets[offset];;
-          removedList = &m_RemovedOffsets[offset];*/
+          addedList = &m_AddedOffsets[offset];;
+          removedList = &m_RemovedOffsets[offset];
           }
         }
       else
@@ -357,8 +357,8 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
         if( axe >= 0 )
           {
           offset[m_Axes[axe]] = direction[m_Axes[axe]];
-/*          addedList = &m_AddedOffsets[offset];;
-          removedList = &m_RemovedOffsets[offset];*/
+          addedList = &m_AddedOffsets[offset];;
+          removedList = &m_RemovedOffsets[offset];
           }
         }
       }
