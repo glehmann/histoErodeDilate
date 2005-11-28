@@ -17,13 +17,12 @@
 #ifndef __itkHistogramDilateImageFilter_h
 #define __itkHistogramDilateImageFilter_h
 
-#include "itkImageToImageFilter.h"
+#include "itkMovingHistogramImageFilterBase.h"
 #include <list>
 #include <map>
 #include "itkOffsetLexicographicCompare.h"
 
 namespace itk {
-
 
 /**
  * \class HistogramDilateImageFilter
@@ -42,12 +41,12 @@ namespace itk {
 
 template<class TInputImage, class TOutputImage, class TKernel>
 class ITK_EXPORT HistogramDilateImageFilter : 
-    public ImageToImageFilter<TInputImage, TOutputImage>
+    public MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel>
 {
 public:
   /** Standard class typedefs. */
   typedef HistogramDilateImageFilter Self;
-  typedef ImageToImageFilter<TInputImage,TOutputImage>  Superclass;
+  typedef MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel> Superclass;
   typedef SmartPointer<Self>        Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
   
@@ -86,25 +85,10 @@ public:
 
   typedef typename std::map< OffsetType, OffsetListType, typename Functor::OffsetLexicographicCompare<ImageDimension> > OffsetMapType;
 
-  /** Set kernel (structuring element). */
-  void SetKernel( const KernelType& kernel );
-
-  /** Get the kernel (structuring element). */
-  itkGetConstReferenceMacro(Kernel, KernelType);
-  
-  itkGetMacro(PixelsPerTranslation, unsigned long);
-  
   /** Set/Get the boundary value. */
   itkSetMacro(Boundary, PixelType);
   itkGetMacro(Boundary, PixelType);
   
-  /** HistogramDilateImageFilter need to make sure they request enough of an
-   * input image to account for the structuring element size.  The input
-   * requested region is expanded by the radius of the structuring element.
-   * If the request extends past the LargestPossibleRegion for the input,
-   * the request is cropped by the LargestPossibleRegion. */
-  void GenerateInputRequestedRegion() ;
-
 protected:
   HistogramDilateImageFilter();
   ~HistogramDilateImageFilter() {};
@@ -119,20 +103,6 @@ protected:
 private:
   HistogramDilateImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
-
-  /** kernel or structuring element to use. */
-  KernelType m_Kernel ;
-
-  // store the added and removed pixel offset in a list
-  OffsetMapType m_AddedOffsets;
-  OffsetMapType m_RemovedOffsets;
-
-  // store the offset of the kernel to initialize the histogram
-  OffsetListType m_KernelOffsets;
-
-  typename itk::FixedArray< int, ImageDimension > m_Axes;
-
-  unsigned long m_PixelsPerTranslation;
 
   PixelType m_Boundary;
 } ; // end of class
