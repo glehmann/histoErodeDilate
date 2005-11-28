@@ -31,191 +31,10 @@ namespace itk {
 template<class TInputImage, class TOutputImage, class TKernel>
 HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
 ::HistogramErodeImageFilter()
-  : m_Kernel()
 {
-  m_PixelsPerTranslation = 0;
   m_Boundary = itk::NumericTraits< PixelType >::max();
 }
 
-template<class TInputImage, class TOutputImage, class TKernel>
-void
-HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
-::GenerateInputRequestedRegion()
-{
-  // call the superclass' implementation of this method
-  Superclass::GenerateInputRequestedRegion();
-  
-  // get pointers to the input and output
-  typename Superclass::InputImagePointer  inputPtr = 
-    const_cast< TInputImage * >( this->GetInput() );
-  
-  if ( !inputPtr )
-    {
-    return;
-    }
-
-  // get a copy of the input requested region (should equal the output
-  // requested region)
-  typename TInputImage::RegionType inputRequestedRegion;
-  inputRequestedRegion = inputPtr->GetRequestedRegion();
-
-  // pad the input requested region by the operator radius
-  inputRequestedRegion.PadByRadius( m_Kernel.GetRadius() );
-
-  // crop the input requested region at the input's largest possible region
-  if ( inputRequestedRegion.Crop(inputPtr->GetLargestPossibleRegion()) )
-    {
-    inputPtr->SetRequestedRegion( inputRequestedRegion );
-    return;
-    }
-  else
-    {
-    // Couldn't crop the region (requested region is outside the largest
-    // possible region).  Throw an exception.
-
-    // store what we tried to request (prior to trying to crop)
-    inputPtr->SetRequestedRegion( inputRequestedRegion );
-    
-    // build an exception
-    InvalidRequestedRegionError e(__FILE__, __LINE__);
-    OStringStream msg;
-    msg << static_cast<const char *>(this->GetNameOfClass())
-        << "::GenerateInputRequestedRegion()";
-    e.SetLocation(msg.str().c_str());
-    e.SetDescription("Requested region is (at least partially) outside the largest possible region.");
-    e.SetDataObject(inputPtr);
-    throw e;
-    }
-}
-
-template< class TInputImage, class TOutputImage, class TKernel>
-void
-HistogramErodeImageFilter< TInputImage, TOutputImage, TKernel>
-::SetKernel( const KernelType& kernel )
-{
-  // first, build the list of offsets of added and removed pixels when the 
-  // structuring element move of 1 pixel on 1 axe; do it for the 2 directions
-  // on each axes.
-  
-  // transform the structuring element in an image for an easier
-  // access to the data
-  typedef Image< bool, TInputImage::ImageDimension > BoolImageType;
-  typename BoolImageType::Pointer tmpSEImage = BoolImageType::New();
-  tmpSEImage->SetRegions( kernel.GetSize() );
-  tmpSEImage->Allocate();
-  RegionType tmpSEImageRegion = tmpSEImage->GetRequestedRegion();
-  ImageRegionIteratorWithIndex<BoolImageType> kernelImageIt;
-  kernelImageIt = ImageRegionIteratorWithIndex<BoolImageType>(tmpSEImage, tmpSEImageRegion);
-  kernelImageIt.GoToBegin();
-  KernelIteratorType kernel_it = kernel.Begin();
-  OffsetListType kernelOffsets;
-
-  // create a center index to compute the offset
-  IndexType centerIndex;
-  for( int axe=0; axe<ImageDimension; axe++)
-    { centerIndex[axe] = kernel.GetSize()[axe] / 2; }
-  
-  unsigned long count = 0;
-  while( !kernelImageIt.IsAtEnd() )
-    {
-    kernelImageIt.Set( *kernel_it > 0 );
-    if( *kernel_it > 0 )
-      {
-      kernelImageIt.Set( true );
-      kernelOffsets.push_front( kernelImageIt.GetIndex() - centerIndex );
-      count++;
-      }
-    else
-      { kernelImageIt.Set( false ); }
-    ++kernelImageIt;
-    ++kernel_it;
-    }
-    
-
-  // verify that the kernel contain at least one point
-  if( count == 0 )
-    { itkExceptionMacro( << "The kernel must contain at least one point." ); }
-
-  // no attribute should be modified before here to avoid setting the filter in a bad status
-  // store the kernel !!
-  m_Kernel = kernel;
-
-  // clear the already stored values
-  m_AddedOffsets.clear();
-  m_RemovedOffsets.clear();
-  //m_Axes
-
-  // store the kernel offset list
-  m_KernelOffsets = kernelOffsets;
-
-  typename itk::FixedArray< unsigned long, ImageDimension > axeCount;
-  axeCount.Fill( 0 );
-
-  for( int axe=0; axe<ImageDimension; axe++)
-    {
-    OffsetType refOffset;
-    refOffset.Fill( 0 );
-    for( int direction=-1; direction<=1; direction +=2)
-      {
-      refOffset[axe] = direction;
-      for( kernelImageIt.GoToBegin(); !kernelImageIt.IsAtEnd(); ++kernelImageIt)
-        {
-        IndexType idx = kernelImageIt.GetIndex();
-        
-        if( kernelImageIt.Get() )
-          {
-          // search for added pixel during a translation
-          IndexType nextIdx = idx + refOffset;
-          if( tmpSEImageRegion.IsInside( nextIdx ) )
-            {
-            if( !tmpSEImage->GetPixel( nextIdx ) )
-              {
-                m_AddedOffsets[refOffset].push_front( nextIdx - centerIndex );
-                axeCount[axe]++;
-              }
-            }
-          else
-            {
-              m_AddedOffsets[refOffset].push_front( nextIdx - centerIndex );
-              axeCount[axe]++;
-            }
-          // search for removed pixel during a translation
-          IndexType prevIdx = idx - refOffset;
-          if( tmpSEImageRegion.IsInside( prevIdx ) )
-            {
-            if( !tmpSEImage->GetPixel( prevIdx ) )
-              {
-                m_RemovedOffsets[refOffset].push_front( idx - centerIndex );
-                axeCount[axe]++;
-              }
-            }
-          else
-            {
-              m_RemovedOffsets[refOffset].push_front( idx - centerIndex );
-              axeCount[axe]++;
-            }
-
-          }
-        }
-      }
-    }
-    
-    // search for the best axe
-    typedef typename std::multimap<unsigned long, int, typename std::greater< unsigned long > > MapCountType;
-    MapCountType invertedCount;
-    for( int i=0; i<ImageDimension; i++ )
-      {
-      invertedCount.insert( typename MapCountType::value_type( axeCount[i], i ) );
-      }
-
-    int i=0;
-    for( typename MapCountType::iterator it=invertedCount.begin(); it!=invertedCount.end(); it++, i++ )
-      {
-      m_Axes[i] = it->second;
-      }
-
-    m_PixelsPerTranslation = axeCount[m_Axes[ImageDimension - 1]] / 2;  // divided by 2 because there is 2 directions on the axe
-}
 
 template<class TInputImage, class TOutputImage, class TKernel>
 void
@@ -234,7 +53,7 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
     RegionType inputRegion = inputImage->GetRequestedRegion();
     
     // initialize the histogram
-    for( typename OffsetListType::iterator listIt = m_KernelOffsets.begin(); listIt != m_KernelOffsets.end(); listIt++ )
+    for( typename OffsetListType::iterator listIt = this->m_KernelOffsets.begin(); listIt != this->m_KernelOffsets.end(); listIt++ )
       {
       IndexType idx = outputRegionForThread.GetIndex() + (*listIt);
       if( inputRegion.IsInside( idx ) )
@@ -254,7 +73,7 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
     OffsetType offset;
     offset.Fill( 0 );
     RegionType stRegion;
-    stRegion.SetSize( m_Kernel.GetSize() );
+    stRegion.SetSize( this->m_Kernel.GetSize() );
     stRegion.PadByRadius( 1 ); // must pad the region by one because of the translation
   
     OffsetType centerOffset;
@@ -262,10 +81,10 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
       { centerOffset[axe] = stRegion.GetSize()[axe] / 2; }
 
     // init the offset and get the lists for the best axe
-    offset[m_Axes[axe]] = direction[m_Axes[axe]];
+    offset[this->m_Axes[axe]] = direction[this->m_Axes[axe]];
     // it's very important for performances to get a pointer and not a copy
-    const OffsetListType* addedList = &m_AddedOffsets[offset];;
-    const OffsetListType* removedList = &m_RemovedOffsets[offset];
+    const OffsetListType* addedList = &this->m_AddedOffsets[offset];;
+    const OffsetListType* removedList = &this->m_RemovedOffsets[offset];
 
     while( axe >= 0 )
       {
@@ -334,12 +153,12 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
         
         if( axe != ImageDimension - 1 )
           {
-          offset[m_Axes[axe]] = 0;
+          offset[this->m_Axes[axe]] = 0;
           // the axe must be the last one
           axe = ImageDimension - 1;
-          offset[m_Axes[axe]] = direction[m_Axes[axe]];
-          addedList = &m_AddedOffsets[offset];;
-          removedList = &m_RemovedOffsets[offset];
+          offset[this->m_Axes[axe]] = direction[this->m_Axes[axe]];
+          addedList = &this->m_AddedOffsets[offset];;
+          removedList = &this->m_RemovedOffsets[offset];
           }
         }
       else
@@ -348,18 +167,18 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
         // we need to switch to another axe
         
         // invert the direction of the current axe
-        direction[m_Axes[axe]] *= -1;
+        direction[this->m_Axes[axe]] *= -1;
         // set the offset of the current axe to 0
         // -> offset == [0]*dim
-        offset[m_Axes[axe]] = 0;
+        offset[this->m_Axes[axe]] = 0;
         // and switch to another axe
         axe--;
         
         if( axe >= 0 )
           {
-          offset[m_Axes[axe]] = direction[m_Axes[axe]];
-          addedList = &m_AddedOffsets[offset];;
-          removedList = &m_RemovedOffsets[offset];
+          offset[this->m_Axes[axe]] = direction[this->m_Axes[axe]];
+          addedList = &this->m_AddedOffsets[offset];;
+          removedList = &this->m_RemovedOffsets[offset];
           }
         }
       }
@@ -372,7 +191,7 @@ HistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
 {
   Superclass::PrintSelf(os, indent);
 
-  os << indent << "Kernel: " << m_Kernel << std::endl;
+  os << indent << "Boundary: " << m_Boundary << std::endl;
 }
 
 }// end namespace itk
