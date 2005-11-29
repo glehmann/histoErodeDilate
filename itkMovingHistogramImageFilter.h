@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile: itkHistogramMorphologicalGradientImageFilter.h,v $
+  Module:    $RCSfile: itkMovingHistogramImageFilter.h,v $
   Language:  C++
   Date:      $Date: 2004/04/30 21:02:03 $
   Version:   $Revision: 1.15 $
@@ -14,10 +14,9 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __itkHistogramMorphologicalGradientImageFilter_h
-#define __itkHistogramMorphologicalGradientImageFilter_h
+#ifndef __itkMovingHistogramImageFilter_h
+#define __itkMovingHistogramImageFilter_h
 
-#include "itkMovingHistogramImageFilter.h"
 #include "itkMovingHistogramImageFilterBase.h"
 #include <list>
 #include <map>
@@ -25,51 +24,29 @@
 
 namespace itk {
 
-namespace Function {
-template <class TInputPixel>
-class MorphologicalGradientFunctor
-{
-public:
-  MorphologicalGradientFunctor(){}
-  ~MorphologicalGradientFunctor(){}
-
-  typedef typename std::map< TInputPixel, unsigned long > HistogramType;
-
-  inline TInputPixel operator()( const HistogramType &histogram )
-  {
-    if( !histogram.empty() )
-      { return histogram.rbegin()->first - histogram.begin()->first; }
-    return 0;
-  }
-};
-} // end namespace Function
-
 /**
- * \class HistogramMorphologicalGradientImageFilter
+ * \class MovingHistogramImageFilter
  * \brief gray scale dilation of an image
  *
- * MorphologicalGradient an image using grayscale morphology. Dilation takes the
+ * Dilate an image using grayscale morphology. Dilation takes the
  * maximum of all the pixels identified by the structuring element.
  *
  * The structuring element is assumed to be composed of binary
  * values (zero or one). Only elements of the structuring element
  * having values > 0 are candidates for affecting the center pixel.
  * 
- * \sa MorphologyImageFilter, GrayscaleFunctionMorphologicalGradientImageFilter, BinaryMorphologicalGradientImageFilter
+ * \sa MorphologyImageFilter, GrayscaleFunctionDilateImageFilter, BinaryDilateImageFilter
  * \ingroup ImageEnhancement  MathematicalMorphologyImageFilters
  */
 
-
-template<class TInputImage, class TOutputImage, class TKernel>
-class ITK_EXPORT HistogramMorphologicalGradientImageFilter : 
-    public MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel,
-      typename  Function::MorphologicalGradientFunctor< typename TInputImage::PixelType >,
-      typename Function::MorphologicalGradientFunctor< typename TInputImage::PixelType >::HistogramType >
+template<class TInputImage, class TOutputImage, class TKernel, class TValueFunctor, class THistogram >
+class ITK_EXPORT MovingHistogramImageFilter : 
+    public MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel>
 {
 public:
   /** Standard class typedefs. */
-  typedef HistogramMorphologicalGradientImageFilter Self;
-  typedef ImageToImageFilter<TInputImage,TOutputImage>  Superclass;
+  typedef MovingHistogramImageFilter Self;
+  typedef MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel> Superclass;
   typedef SmartPointer<Self>        Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
   
@@ -77,7 +54,7 @@ public:
   itkNewMacro(Self);  
 
   /** Runtime information support. */
-  itkTypeMacro(HistogramMorphologicalGradientImageFilter, 
+  itkTypeMacro(MovingHistogramImageFilter, 
                ImageToImageFilter);
   
   /** Image related typedefs. */
@@ -95,20 +72,41 @@ public:
   itkStaticConstMacro(ImageDimension, unsigned int,
                       TInputImage::ImageDimension);
                       
+  /** Kernel typedef. */
+  typedef TKernel KernelType;
+  
+  /** Kernel (structuring element) iterator. */
+  typedef typename KernelType::ConstIterator KernelIteratorType ;
+  
+  /** n-dimensional Kernel radius. */
+  typedef typename KernelType::SizeType RadiusType ;
+
+  typedef typename std::list< OffsetType > OffsetListType;
+
+  typedef typename std::map< OffsetType, OffsetListType, typename Functor::OffsetLexicographicCompare<ImageDimension> > OffsetMapType;
 
 protected:
-  HistogramMorphologicalGradientImageFilter() {};
-  ~HistogramMorphologicalGradientImageFilter() {};
+  MovingHistogramImageFilter();
+  ~MovingHistogramImageFilter() {};
+  
+  /** Multi-thread version GenerateData. */
+  void  ThreadedGenerateData (const OutputImageRegionType& 
+                              outputRegionForThread,
+                              int threadId) ;
 
 
 private:
-  HistogramMorphologicalGradientImageFilter(const Self&); //purposely not implemented
+  MovingHistogramImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
 } ; // end of class
 
 } // end namespace itk
   
+#ifndef ITK_MANUAL_INSTANTIATION
+#include "itkMovingHistogramImageFilter.txx"
+#endif
+
 #endif
 
 
