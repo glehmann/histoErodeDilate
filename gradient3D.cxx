@@ -60,7 +60,7 @@ int main(int, char * argv[])
   kernel.SetRadius( 1 );
   for( SRType::Iterator kit=kernel.Begin(); kit!=kernel.End(); kit++ )
     {
-    *kit = 0;
+    *kit = 1;
     }
   *kernel.Begin() = 1;
   
