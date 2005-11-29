@@ -1,6 +1,6 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
-#include "itkHistogramMorphologicalGradientImageFilter.h"
+#include "itkMovingHistogramMorphologicalGradientImageFilter.h"
 #include "itkBasicMorphologicalGradientImageFilter.h"
 #include "itkNeighborhood.h"
 #include "itkTimeProbe.h"
@@ -64,7 +64,7 @@ int main(int, char * argv[])
     }
   *kernel.Begin() = 1;
   
-  typedef itk::HistogramMorphologicalGradientImageFilter< IType, IType, SRType > MorphologicalGradientType;
+  typedef itk::MovingHistogramMorphologicalGradientImageFilter< IType, IType, SRType > MorphologicalGradientType;
   MorphologicalGradientType::Pointer hgradient = MorphologicalGradientType::New();
   hgradient->SetInput( reader->GetOutput() );
   hgradient->SetKernel( kernel );

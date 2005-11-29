@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile: itkHistogramDilateImageFilter.txx,v $
+  Module:    $RCSfile: itkMovingHistogramErodeImageFilter.txx,v $
   Language:  C++
   Date:      $Date: 2004/04/30 21:02:03 $
   Version:   $Revision: 1.14 $
@@ -14,10 +14,10 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __itkHistogramDilateImageFilter_txx
-#define __itkHistogramDilateImageFilter_txx
+#ifndef __itkMovingHistogramErodeImageFilter_txx
+#define __itkMovingHistogramErodeImageFilter_txx
 
-#include "itkHistogramDilateImageFilter.h"
+#include "itkMovingHistogramErodeImageFilter.h"
 #include "itkImageRegionIteratorWithIndex.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
 #include "itkOffset.h"
@@ -29,23 +29,23 @@ namespace itk {
 
 
 template<class TInputImage, class TOutputImage, class TKernel>
-HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
-::HistogramDilateImageFilter()
+MovingHistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
+::MovingHistogramErodeImageFilter()
 {
-  m_Boundary = itk::NumericTraits< PixelType >::NonpositiveMin();
+  m_Boundary = itk::NumericTraits< PixelType >::max();
 }
 
 
 template<class TInputImage, class TOutputImage, class TKernel>
 void
-HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
+MovingHistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
 ::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
                        int threadId) 
 {
     ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels());
     
     // declare the type used to store the histogram, and instanciate the histogram
-    typedef typename std::map< PixelType, unsigned long, typename std::greater< PixelType > > HistogramType;
+    typedef typename std::map< PixelType, unsigned long > HistogramType;
     HistogramType histogram;
     
     OutputImageType* outputImage = this->GetOutput();
@@ -186,7 +186,7 @@ HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
 
 template<class TInputImage, class TOutputImage, class TKernel>
 void
-HistogramDilateImageFilter<TInputImage, TOutputImage, TKernel>
+MovingHistogramErodeImageFilter<TInputImage, TOutputImage, TKernel>
 ::PrintSelf(std::ostream &os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);

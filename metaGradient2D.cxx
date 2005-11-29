@@ -81,7 +81,7 @@ int main(int, char * argv[])
   writer->SetFileName( argv[2] );
   writer->Update();
   
-  gradient->SetNameOfBackendFilterClass("HistogramMorphologicalGradientImageFilter");
+  gradient->SetNameOfBackendFilterClass("MovingHistogramMorphologicalGradientImageFilter");
   writer->SetFileName( argv[3] );
   writer->Update();
   

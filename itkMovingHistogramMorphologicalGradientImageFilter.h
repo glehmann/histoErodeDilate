@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile: itkHistogramMorphologicalGradientImageFilter.h,v $
+  Module:    $RCSfile: itkMovingHistogramMorphologicalGradientImageFilter.h,v $
   Language:  C++
   Date:      $Date: 2004/04/30 21:02:03 $
   Version:   $Revision: 1.15 $
@@ -14,8 +14,8 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __itkHistogramMorphologicalGradientImageFilter_h
-#define __itkHistogramMorphologicalGradientImageFilter_h
+#ifndef __itkMovingHistogramMorphologicalGradientImageFilter_h
+#define __itkMovingHistogramMorphologicalGradientImageFilter_h
 
 #include "itkMovingHistogramImageFilter.h"
 #include "itkMovingHistogramImageFilterBase.h"
@@ -45,7 +45,7 @@ public:
 } // end namespace Function
 
 /**
- * \class HistogramMorphologicalGradientImageFilter
+ * \class MovingHistogramMorphologicalGradientImageFilter
  * \brief gray scale dilation of an image
  *
  * MorphologicalGradient an image using grayscale morphology. Dilation takes the
@@ -61,14 +61,14 @@ public:
 
 
 template<class TInputImage, class TOutputImage, class TKernel>
-class ITK_EXPORT HistogramMorphologicalGradientImageFilter : 
+class ITK_EXPORT MovingHistogramMorphologicalGradientImageFilter : 
     public MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel,
       typename  Function::MorphologicalGradientFunctor< typename TInputImage::PixelType >,
       typename Function::MorphologicalGradientFunctor< typename TInputImage::PixelType >::HistogramType >
 {
 public:
   /** Standard class typedefs. */
-  typedef HistogramMorphologicalGradientImageFilter Self;
+  typedef MovingHistogramMorphologicalGradientImageFilter Self;
   typedef ImageToImageFilter<TInputImage,TOutputImage>  Superclass;
   typedef SmartPointer<Self>        Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
@@ -77,7 +77,7 @@ public:
   itkNewMacro(Self);  
 
   /** Runtime information support. */
-  itkTypeMacro(HistogramMorphologicalGradientImageFilter, 
+  itkTypeMacro(MovingHistogramMorphologicalGradientImageFilter, 
                ImageToImageFilter);
   
   /** Image related typedefs. */
@@ -97,12 +97,12 @@ public:
                       
 
 protected:
-  HistogramMorphologicalGradientImageFilter() {};
-  ~HistogramMorphologicalGradientImageFilter() {};
+  MovingHistogramMorphologicalGradientImageFilter() {};
+  ~MovingHistogramMorphologicalGradientImageFilter() {};
 
 
 private:
-  HistogramMorphologicalGradientImageFilter(const Self&); //purposely not implemented
+  MovingHistogramMorphologicalGradientImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
 } ; // end of class

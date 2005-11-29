@@ -1,6 +1,6 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
-#include "itkHistogramDilateImageFilter.h"
+#include "itkMovingHistogramDilateImageFilter.h"
 #include "itkBasicDilateImageFilter.h"
 #include "itkBinaryDilateImageFilter.h"
 #include "itkBinaryBallStructuringElement.h"
@@ -23,7 +23,7 @@ int main(int, char * argv[])
   
   typedef itk::BinaryBallStructuringElement< PType, dim > SRType;
   
-  typedef itk::HistogramDilateImageFilter< IType, IType, SRType > HDilateType;
+  typedef itk::MovingHistogramDilateImageFilter< IType, IType, SRType > HDilateType;
   HDilateType::Pointer hdilate = HDilateType::New();
   hdilate->SetInput( reader->GetOutput() );
   

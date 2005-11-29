@@ -18,7 +18,7 @@
 #define __itkMorphologicalGradientImageFilter_h
 
 #include "itkImageToImageFilter.h"
-#include "itkHistogramMorphologicalGradientImageFilter.h"
+#include "itkMovingHistogramMorphologicalGradientImageFilter.h"
 #include "itkBasicMorphologicalGradientImageFilter.h"
 #include "itkConstantBoundaryCondition.h"
 
@@ -67,7 +67,7 @@ public:
   typedef typename TInputImage::OffsetType OffsetType ;
   typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
-  typedef HistogramMorphologicalGradientImageFilter< TInputImage, TOutputImage, TKernel > HistogramFilterType;
+  typedef MovingHistogramMorphologicalGradientImageFilter< TInputImage, TOutputImage, TKernel > HistogramFilterType;
   typedef BasicMorphologicalGradientImageFilter< TInputImage, TOutputImage, TKernel > BasicFilterType;
   
   /** Image related typedefs. */

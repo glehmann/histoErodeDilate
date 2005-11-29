@@ -81,7 +81,7 @@ int main(int, char * argv[])
   writer->SetFileName( argv[2] );
   writer->Update();
   
-  dilate->SetNameOfBackendFilterClass("HistogramDilateImageFilter");
+  dilate->SetNameOfBackendFilterClass("MovingHistogramDilateImageFilter");
   writer->SetFileName( argv[3] );
   writer->Update();
   

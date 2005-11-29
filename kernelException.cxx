@@ -1,8 +1,8 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
-#include "itkHistogramDilateImageFilter.h"
-#include "itkHistogramErodeImageFilter.h"
-#include "itkHistogramMorphologicalGradientImageFilter.h"
+#include "itkMovingHistogramDilateImageFilter.h"
+#include "itkMovingHistogramErodeImageFilter.h"
+#include "itkMovingHistogramMorphologicalGradientImageFilter.h"
 #include "itkNeighborhood.h"
 
 int main(int, char * argv[])
@@ -20,13 +20,13 @@ int main(int, char * argv[])
     *kit = 0;
     }
 
-  typedef itk::HistogramDilateImageFilter< IType, IType, SRType > HDilateType;
+  typedef itk::MovingHistogramDilateImageFilter< IType, IType, SRType > HDilateType;
   HDilateType::Pointer hdilate = HDilateType::New();
   
-  typedef itk::HistogramErodeImageFilter< IType, IType, SRType > HErodeType;
+  typedef itk::MovingHistogramErodeImageFilter< IType, IType, SRType > HErodeType;
   HErodeType::Pointer herode = HErodeType::New();
   
-  typedef itk::HistogramMorphologicalGradientImageFilter< IType, IType, SRType > HMorphologicalGradientType;
+  typedef itk::MovingHistogramMorphologicalGradientImageFilter< IType, IType, SRType > HMorphologicalGradientType;
   HMorphologicalGradientType::Pointer hgradient = HMorphologicalGradientType::New();
   
   try

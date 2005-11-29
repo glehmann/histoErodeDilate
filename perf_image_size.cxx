@@ -1,6 +1,6 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
-#include "itkHistogramDilateImageFilter.h"
+#include "itkMovingHistogramDilateImageFilter.h"
 #include "itkBasicDilateImageFilter.h"
 #include "itkCropImageFilter.h"
 #include "itkNeighborhood.h"
@@ -32,7 +32,7 @@ int main(int, char * argv[])
   for( SRType::Iterator kit=kernel.Begin(); kit!=kernel.End(); kit++ )
     { *kit = 1; }
   
-  typedef itk::HistogramDilateImageFilter< IType, IType, SRType > HDilateType;
+  typedef itk::MovingHistogramDilateImageFilter< IType, IType, SRType > HDilateType;
   HDilateType::Pointer hdilate = HDilateType::New();
   hdilate->SetInput( crop->GetOutput() );
   hdilate->SetKernel( kernel );

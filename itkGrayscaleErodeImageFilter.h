@@ -18,7 +18,7 @@
 #define __itkGrayscaleErodeImageFilter_h
 
 #include "itkImageToImageFilter.h"
-#include "itkHistogramErodeImageFilter.h"
+#include "itkMovingHistogramErodeImageFilter.h"
 #include "itkBasicErodeImageFilter.h"
 #include "itkConstantBoundaryCondition.h"
 
@@ -67,7 +67,7 @@ public:
   typedef typename TInputImage::OffsetType OffsetType ;
   typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
-  typedef HistogramErodeImageFilter< TInputImage, TOutputImage, TKernel > HistogramFilterType;
+  typedef MovingHistogramErodeImageFilter< TInputImage, TOutputImage, TKernel > HistogramFilterType;
   typedef BasicErodeImageFilter< TInputImage, TOutputImage, TKernel > BasicFilterType;
   
   /** Image related typedefs. */

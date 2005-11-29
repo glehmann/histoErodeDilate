@@ -1,6 +1,6 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
-#include "itkHistogramErodeImageFilter.h"
+#include "itkMovingHistogramErodeImageFilter.h"
 #include "itkBasicErodeImageFilter.h"
 #include "itkNeighborhood.h"
 #include "itkTimeProbe.h"
@@ -64,7 +64,7 @@ int main(int, char * argv[])
     }
   *kernel.Begin() = 1;
   
-  typedef itk::HistogramErodeImageFilter< IType, IType, SRType > ErodeType;
+  typedef itk::MovingHistogramErodeImageFilter< IType, IType, SRType > ErodeType;
   ErodeType::Pointer herode = ErodeType::New();
   herode->SetInput( reader->GetOutput() );
   herode->SetKernel( kernel );

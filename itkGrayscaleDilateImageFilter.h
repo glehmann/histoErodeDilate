@@ -18,7 +18,7 @@
 #define __itkGrayscaleDilateImageFilter_h
 
 #include "itkImageToImageFilter.h"
-#include "itkHistogramDilateImageFilter.h"
+#include "itkMovingHistogramDilateImageFilter.h"
 #include "itkBasicDilateImageFilter.h"
 #include "itkConstantBoundaryCondition.h"
 
@@ -67,7 +67,7 @@ public:
   typedef typename TInputImage::OffsetType OffsetType ;
   typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
 
-  typedef HistogramDilateImageFilter< TInputImage, TOutputImage, TKernel > HistogramFilterType;
+  typedef MovingHistogramDilateImageFilter< TInputImage, TOutputImage, TKernel > HistogramFilterType;
   typedef BasicDilateImageFilter< TInputImage, TOutputImage, TKernel > BasicFilterType;
   
   /** Image related typedefs. */

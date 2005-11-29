@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile: itkHistogramErodeImageFilter.h,v $
+  Module:    $RCSfile: itkMovingHistogramDilateImageFilter.h,v $
   Language:  C++
   Date:      $Date: 2004/04/30 21:02:03 $
   Version:   $Revision: 1.15 $
@@ -14,8 +14,8 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __itkHistogramErodeImageFilter_h
-#define __itkHistogramErodeImageFilter_h
+#ifndef __itkMovingHistogramDilateImageFilter_h
+#define __itkMovingHistogramDilateImageFilter_h
 
 #include "itkMovingHistogramImageFilterBase.h"
 #include <list>
@@ -25,27 +25,27 @@
 namespace itk {
 
 /**
- * \class HistogramErodeImageFilter
+ * \class MovingHistogramDilateImageFilter
  * \brief gray scale dilation of an image
  *
- * Erode an image using grayscale morphology. Dilation takes the
+ * Dilate an image using grayscale morphology. Dilation takes the
  * maximum of all the pixels identified by the structuring element.
  *
  * The structuring element is assumed to be composed of binary
  * values (zero or one). Only elements of the structuring element
  * having values > 0 are candidates for affecting the center pixel.
  * 
- * \sa MorphologyImageFilter, GrayscaleFunctionErodeImageFilter, BinaryErodeImageFilter
+ * \sa MorphologyImageFilter, GrayscaleFunctionDilateImageFilter, BinaryDilateImageFilter
  * \ingroup ImageEnhancement  MathematicalMorphologyImageFilters
  */
 
 template<class TInputImage, class TOutputImage, class TKernel>
-class ITK_EXPORT HistogramErodeImageFilter : 
+class ITK_EXPORT MovingHistogramDilateImageFilter : 
     public MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel>
 {
 public:
   /** Standard class typedefs. */
-  typedef HistogramErodeImageFilter Self;
+  typedef MovingHistogramDilateImageFilter Self;
   typedef MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel> Superclass;
   typedef SmartPointer<Self>        Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
@@ -54,7 +54,7 @@ public:
   itkNewMacro(Self);  
 
   /** Runtime information support. */
-  itkTypeMacro(HistogramErodeImageFilter, 
+  itkTypeMacro(MovingHistogramDilateImageFilter, 
                ImageToImageFilter);
   
   /** Image related typedefs. */
@@ -90,8 +90,8 @@ public:
   itkGetMacro(Boundary, PixelType);
   
 protected:
-  HistogramErodeImageFilter();
-  ~HistogramErodeImageFilter() {};
+  MovingHistogramDilateImageFilter();
+  ~MovingHistogramDilateImageFilter() {};
   void PrintSelf(std::ostream& os, Indent indent) const;
   
   /** Multi-thread version GenerateData. */
@@ -101,7 +101,7 @@ protected:
 
 
 private:
-  HistogramErodeImageFilter(const Self&); //purposely not implemented
+  MovingHistogramDilateImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
   PixelType m_Boundary;
@@ -110,7 +110,7 @@ private:
 } // end namespace itk
   
 #ifndef ITK_MANUAL_INSTANTIATION
-#include "itkHistogramErodeImageFilter.txx"
+#include "itkMovingHistogramDilateImageFilter.txx"
 #endif
 
 #endif
