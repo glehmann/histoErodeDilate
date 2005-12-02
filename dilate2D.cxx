@@ -63,7 +63,9 @@ int main(int, char * argv[])
     {
     *kit = 0;
     }
-  *kernel.Begin() = 1;
+  SRType::Iterator kit=kernel.Begin();
+  *kit = 1;
+  *(++kit) = 1;
   
   typedef itk::MovingHistogramDilateImageFilter< IType, IType, SRType > DilateType;
   DilateType::Pointer hdilate = DilateType::New();

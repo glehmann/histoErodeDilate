@@ -62,7 +62,9 @@ int main(int, char * argv[])
     {
     *kit = 0;
     }
-  *kernel.Begin() = 1;
+  SRType::Iterator kit=kernel.Begin();
+  *kit = 1;
+  *(++kit) = 1;
   
   typedef itk::MovingHistogramErodeImageFilter< IType, IType, SRType > ErodeType;
   ErodeType::Pointer herode = ErodeType::New();
