@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile: itkMovingHistogramErodeImageFilter.h,v $
+  Module:    $RCSfile: itkMovingHistogramMorphologyImageFilter.h,v $
   Language:  C++
   Date:      $Date: 2004/04/30 21:02:03 $
   Version:   $Revision: 1.15 $
@@ -14,10 +14,10 @@
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef __itkMovingHistogramErodeImageFilter_h
-#define __itkMovingHistogramErodeImageFilter_h
+#ifndef __itkMovingHistogramMorphologyImageFilter_h
+#define __itkMovingHistogramMorphologyImageFilter_h
 
-#include "itkMovingHistogramMorphologyImageFilter.h"
+#include "itkMovingHistogramImageFilterBase.h"
 #include <list>
 #include <map>
 #include "itkOffsetLexicographicCompare.h"
@@ -25,30 +25,28 @@
 namespace itk {
 
 /**
- * \class MovingHistogramErodeImageFilter
+ * \class MovingHistogramMorphologyImageFilter
  * \brief gray scale dilation of an image
  *
- * MorphologicalGradient an image using grayscale morphology. Dilation takes the
+ * Erode an image using grayscale morphology. Dilation takes the
  * maximum of all the pixels identified by the structuring element.
  *
  * The structuring element is assumed to be composed of binary
  * values (zero or one). Only elements of the structuring element
  * having values > 0 are candidates for affecting the center pixel.
  * 
- * \sa MorphologyImageFilter, GrayscaleFunctionMorphologicalGradientImageFilter, BinaryMorphologicalGradientImageFilter
+ * \sa MorphologyImageFilter, GrayscaleFunctionErodeImageFilter, BinaryErodeImageFilter
  * \ingroup ImageEnhancement  MathematicalMorphologyImageFilters
  */
 
-
-template<class TInputImage, class TOutputImage, class TKernel>
-class ITK_EXPORT MovingHistogramErodeImageFilter : 
-    public MovingHistogramMorphologyImageFilter<TInputImage, TOutputImage, TKernel,
-      typename std::less<typename TInputImage::PixelType>  >
+template<class TInputImage, class TOutputImage, class TKernel, class TCompare>
+class ITK_EXPORT MovingHistogramMorphologyImageFilter : 
+    public MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel>
 {
 public:
   /** Standard class typedefs. */
-  typedef MovingHistogramErodeImageFilter Self;
-  typedef ImageToImageFilter<TInputImage,TOutputImage>  Superclass;
+  typedef MovingHistogramMorphologyImageFilter Self;
+  typedef MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel> Superclass;
   typedef SmartPointer<Self>        Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
   
@@ -56,8 +54,8 @@ public:
   itkNewMacro(Self);  
 
   /** Runtime information support. */
-  itkTypeMacro(MovingHistogramErodeImageFilter, 
-               MovingHistogramMorphologyImageFilter);
+  itkTypeMacro(MovingHistogramMorphologyImageFilter, 
+               ImageToImageFilter);
   
   /** Image related typedefs. */
   typedef TInputImage InputImageType;
@@ -74,23 +72,46 @@ public:
   itkStaticConstMacro(ImageDimension, unsigned int,
                       TInputImage::ImageDimension);
                       
+  /** Kernel typedef. */
+  typedef TKernel KernelType;
+  
+  /** Kernel (structuring element) iterator. */
+  typedef typename KernelType::ConstIterator KernelIteratorType ;
+  
+  /** n-dimensional Kernel radius. */
+  typedef typename KernelType::SizeType RadiusType ;
 
+  typedef typename std::list< OffsetType > OffsetListType;
+
+  typedef typename std::map< OffsetType, OffsetListType, typename Functor::OffsetLexicographicCompare<ImageDimension> > OffsetMapType;
+
+  /** Set/Get the boundary value. */
+  itkSetMacro(Boundary, PixelType);
+  itkGetMacro(Boundary, PixelType);
+  
 protected:
-  MovingHistogramErodeImageFilter()
-  {
-    this->m_Boundary = itk::NumericTraits< PixelType >::max();
-  }
-  ~MovingHistogramErodeImageFilter() {};
+  MovingHistogramMorphologyImageFilter();
+  ~MovingHistogramMorphologyImageFilter() {};
+  void PrintSelf(std::ostream& os, Indent indent) const;
+  
+  /** Multi-thread version GenerateData. */
+  void  ThreadedGenerateData (const OutputImageRegionType& 
+                              outputRegionForThread,
+                              int threadId) ;
 
+  PixelType m_Boundary;
 
 private:
-  MovingHistogramErodeImageFilter(const Self&); //purposely not implemented
+  MovingHistogramMorphologyImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
-
 } ; // end of class
 
 } // end namespace itk
   
+#ifndef ITK_MANUAL_INSTANTIATION
+#include "itkMovingHistogramMorphologyImageFilter.txx"
+#endif
+
 #endif
 
 
