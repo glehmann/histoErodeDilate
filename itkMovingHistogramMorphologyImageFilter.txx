@@ -32,7 +32,9 @@ template<class TInputImage, class TOutputImage, class TKernel, class TCompare>
 MovingHistogramMorphologyImageFilter<TInputImage, TOutputImage, TKernel, TCompare>
 ::MovingHistogramMorphologyImageFilter()
 {
-  m_Boundary = itk::NumericTraits< PixelType >::max();
+  // default m_boundary should be set by subclasses. Just provide a default
+  // value to always get the same behavior if it is not done
+  m_Boundary = itk::NumericTraits< PixelType >::Zero;
 }
 
 
