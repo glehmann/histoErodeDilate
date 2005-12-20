@@ -16,6 +16,7 @@
 #include "itkTimeProbe.h"
 #include <vector>
 #include "itkMultiThreader.h"
+#include <iomanip>
 
 int main(int, char * argv[])
 {
@@ -189,7 +190,7 @@ int main(int, char * argv[])
       hgradient->Modified();
       }
       
-    std::cout << *it << "\t" 
+    std::cout << std::setprecision(3) << *it << "\t" 
               << nbOfRepeats << "\t" 
               << (*it*2+1)*(*it*2+1) << "\t" 
               << nbOfNeighbors << "\t"
