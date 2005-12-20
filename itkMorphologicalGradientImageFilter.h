@@ -26,16 +26,14 @@ namespace itk {
 
 /**
  * \class MorphologicalGradientImageFilter
- * \brief gray scale dilation of an image
+ * \brief Morphological gradients enhance the variation of pixel intensity in a given neighborhood.
  *
- * MorphologicalGradient an image using grayscale morphology. Dilation takes the
- * maximum of all the pixels identified by the structuring element.
- *
- * The structuring element is assumed to be composed of binary
- * values (zero or one). Only elements of the structuring element
- * having values > 0 are candidates for affecting the center pixel.
+ * Morphological gradient is described in Chapter 3.8.1 of Pierre Soille's book 
+ * "Morphological Image Analysis: Principles and Applications", 
+ * Second Edition, Springer, 2003.
  * 
- * \sa MorphologyImageFilter, GrayscaleFunctionMorphologicalGradientImageFilter, BinaryMorphologicalGradientImageFilter
+ * \author Gaëtan Lehmann. Biologie du Développement et de la Reproduction, INRA de Jouy-en-Josas, France.
+ *
  * \ingroup ImageEnhancement  MathematicalMorphologyImageFilters
  */
 

@@ -26,16 +26,12 @@ namespace itk {
 
 /**
  * \class MovingHistogramMorphologyImageFilter
- * \brief gray scale dilation of an image
+ * \brief base class for MovingHistogramDilateImageFilter and MovingHistogramErodeImageFilter
  *
- * Erode an image using grayscale morphology. Dilation takes the
- * maximum of all the pixels identified by the structuring element.
- *
- * The structuring element is assumed to be composed of binary
- * values (zero or one). Only elements of the structuring element
- * having values > 0 are candidates for affecting the center pixel.
+ * This class is similar to MovingHistogramImageFilter but add support
+ * for boundaries and don't fully update the histogram to enhance performances.
  * 
- * \sa MorphologyImageFilter, GrayscaleFunctionErodeImageFilter, BinaryErodeImageFilter
+ * \sa MovingHistogramImageFilter, MovingHistogramDilateImageFilter, MovingHistogramErodeImageFilter
  * \ingroup ImageEnhancement  MathematicalMorphologyImageFilters
  */
 
