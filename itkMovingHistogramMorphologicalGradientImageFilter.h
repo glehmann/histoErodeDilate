@@ -20,7 +20,7 @@
 #include "itkMovingHistogramImageFilter.h"
 #include "itkMovingHistogramImageFilterBase.h"
 #include <list>
-#include <set>
+#include <map>
 #include "itkOffsetLexicographicCompare.h"
 
 namespace itk {
@@ -33,12 +33,12 @@ public:
   MorphologicalGradientFunctor(){}
   ~MorphologicalGradientFunctor(){}
 
-  typedef typename std::multiset< TInputPixel > HistogramType;
+  typedef typename std::map< TInputPixel, unsigned long > HistogramType;
 
   inline TInputPixel operator()( const HistogramType &histogram )
   {
     if( !histogram.empty() )
-      { return *histogram.rbegin() - *histogram.begin(); }
+      { return histogram.rbegin()->first - histogram.begin()->first; }
     return 0;
   }
 };
