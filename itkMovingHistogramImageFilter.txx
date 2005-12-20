@@ -96,7 +96,7 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, TValueFunctor, TH
           for( typename OffsetListType::const_iterator addedIt = addedList->begin(); addedIt != addedList->end(); addedIt++ )
             { histogram.insert( inputImage->GetPixel( currentIdx + (*addedIt) ) ); }
           for( typename OffsetListType::const_iterator removedIt = removedList->begin(); removedIt != removedList->end(); removedIt++ )
-            { histogram.erase( inputImage->GetPixel( currentIdx + (*removedIt) ) ); }
+            { histogram.erase( histogram.begin() ); }
           }
         else
           {
@@ -111,7 +111,7 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, TValueFunctor, TH
             {
             IndexType idx = currentIdx + (*removedIt);
             if( inputRegion.IsInside( idx ) )
-              { histogram.erase( inputImage->GetPixel( idx ) ); }
+              { histogram.erase( histogram.begin() ); }
             }
            }
             
