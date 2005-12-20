@@ -58,7 +58,7 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, TValueFunctor, TH
       {
       IndexType idx = outputRegionForThread.GetIndex() + (*listIt);
       if( inputRegion.IsInside( idx ) )
-        { histogram[inputImage->GetPixel(idx)]++; }
+        { histogram.insert( inputImage->GetPixel( idx ) ); }
       }
     // and set the first point of the image
     outputImage->SetPixel( outputRegionForThread.GetIndex(), static_cast< OutputPixelType >( valueFunction( histogram ) ) );
@@ -94,9 +94,9 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, TValueFunctor, TH
           {
           // update the histogram
           for( typename OffsetListType::const_iterator addedIt = addedList->begin(); addedIt != addedList->end(); addedIt++ )
-            { histogram[ inputImage->GetPixel( currentIdx + (*addedIt) ) ]++; }
+            { histogram.insert( inputImage->GetPixel( currentIdx + (*addedIt) ) ); }
           for( typename OffsetListType::const_iterator removedIt = removedList->begin(); removedIt != removedList->end(); removedIt++ )
-            { histogram[ inputImage->GetPixel( currentIdx + (*removedIt) ) ]--; }
+            { histogram.erase( inputImage->GetPixel( currentIdx + (*removedIt) ) ); }
           }
         else
           {
@@ -105,17 +105,17 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, TValueFunctor, TH
             {
             IndexType idx = currentIdx + (*addedIt);
             if( inputRegion.IsInside( idx ) )
-              { histogram[inputImage->GetPixel( idx )]++; }
+              { histogram.insert( inputImage->GetPixel( idx ) ); }
             }
           for( typename OffsetListType::const_iterator removedIt = removedList->begin(); removedIt != removedList->end(); removedIt++ )
             {
             IndexType idx = currentIdx + (*removedIt);
             if( inputRegion.IsInside( idx ) )
-              { histogram[ inputImage->GetPixel( idx ) ]--; }
+              { histogram.erase( inputImage->GetPixel( idx ) ); }
             }
            }
             
-        typename THistogram::iterator mapIt = histogram.begin();
+/*        typename THistogram::iterator mapIt = histogram.begin();
         while( mapIt != histogram.end() )
           {
           if( mapIt->second == 0 )
@@ -134,13 +134,11 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, TValueFunctor, TH
             // the histogram may become quite big on real type image, but it's an important increase of performances
             // break;
             }
-          }
+          }*/
             
         // histogram is fully uptodate
         // get the highest value
-        OutputPixelType value = 0;
-        if( !histogram.empty() )
-          { value = static_cast< OutputPixelType >( histogram.rbegin()->first - histogram.begin()->first ); }
+        OutputPixelType value = static_cast< OutputPixelType >( valueFunction( histogram ) );
                     
         // store the new index
         currentIdx += offset;
