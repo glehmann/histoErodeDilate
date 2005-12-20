@@ -64,7 +64,8 @@ int main(int, char * argv[])
     IType::SizeType cropSize = imSize - size;
     for(int j=0; j<dim; j++)
       { cropSize[j] = cropSize[j] / 2; }
-    crop->SetBoundaryCropSize( cropSize );
+    crop->SetUpperBoundaryCropSize( cropSize );
+    crop->SetLowerBoundaryCropSize( cropSize );
 
     int nbOfRepeats = 5;
 
