@@ -158,6 +158,7 @@ int main(int, char * argv[])
       bdilate->Update();
       bdtime.Stop();
       bdilate->Modified();
+
       hdtime.Start();
       hdilate->Update();
       hdtime.Stop();

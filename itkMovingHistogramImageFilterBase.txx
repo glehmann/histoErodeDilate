@@ -199,11 +199,14 @@ MovingHistogramImageFilterBase< TInputImage, TOutputImage, TKernel>
     }
     
     // search for the best axe
-    typedef typename std::multimap<unsigned long, int, typename std::greater< PixelType > > MapCountType;
+    typedef typename std::multimap<DirCostType, int, CompCount > MapCountType;
     MapCountType invertedCount;
     for( int i=0; i<ImageDimension; i++ )
       {
-      invertedCount.insert( typename MapCountType::value_type( axeCount[i], i ) );
+      DirCostType V;
+      V.count = axeCount[i];
+      V.dimension=i;
+      invertedCount.insert( typename MapCountType::value_type( V, i ) );
       }
 
     int i=0;

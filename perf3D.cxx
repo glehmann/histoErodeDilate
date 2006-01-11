@@ -140,7 +140,7 @@ int main(int, char * argv[])
       { nbOfRepeats = 2; }
     else
       { nbOfRepeats = 1; }
-    nbOfRepeats = 1;
+    //nbOfRepeats = 1;
 
     for( int i=0; i<nbOfRepeats; i++ )
       {

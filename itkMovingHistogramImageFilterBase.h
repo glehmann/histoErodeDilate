@@ -124,6 +124,27 @@ private:
   MovingHistogramImageFilterBase(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
+  typedef struct {
+    int dimension, count;
+  } DirCostType;
+
+  class CompCount 
+  {
+  public:
+    CompCount(){};
+    ~CompCount(){};
+
+    inline int operator()(const DirCostType &A, const DirCostType &B)
+    {
+      int res = A.count - B.count;
+      if (res == 0) 
+	{
+	res = B.dimension - A.dimension;
+	}
+      return res;
+    }
+  };
+
 } ; // end of class
 
 } // end namespace itk
