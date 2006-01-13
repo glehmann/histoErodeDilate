@@ -1,7 +1,6 @@
 #include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
 #include "itkMovingHistogramDilateImageFilter.h"
-#include "itkBasicDilateImageFilter.h"
 #include "itkNeighborhood.h"
 #include "itkTimeProbe.h"
 #include <vector>
@@ -27,10 +26,6 @@ int main(int, char * argv[])
   HDilateType::Pointer hdilate = HDilateType::New();
   hdilate->SetInput( reader->GetOutput() );
   
-  typedef itk::BasicDilateImageFilter< IType, IType, SRType > DilateType;
-  DilateType::Pointer dilate = DilateType::New();
-  dilate->SetInput( reader->GetOutput() );
-  
 /*  // write 
   typedef itk::ImageFileWriter< IType > WriterType;
   WriterType::Pointer writer = WriterType::New();
@@ -43,7 +38,6 @@ int main(int, char * argv[])
  
   for( int x=0; x<=radMax; x++)
     {
-    itk::TimeProbe time;
     itk::TimeProbe htime;
     
     SRType::RadiusType radius;
@@ -59,20 +53,14 @@ int main(int, char * argv[])
       *it = 1;
       }
   
-    dilate->SetKernel( kernel );
     hdilate->SetKernel( kernel );
     
     for( int i=0; i<5; i++ )
       {
-      time.Start();
-      //dilate->Update();
-      time.Stop();
-      
       htime.Start();
       hdilate->Update();
       htime.Stop();
       
-      dilate->Modified();
       hdilate->Modified();
       }
       
@@ -98,20 +86,14 @@ int main(int, char * argv[])
       *it = 1;
       }
   
-    dilate->SetKernel( kernel );
     hdilate->SetKernel( kernel );
     
     for( int i=0; i<5; i++ )
       {
-      time.Start();
-      //dilate->Update();
-      time.Stop();
-      
       htime.Start();
       hdilate->Update();
       htime.Stop();
       
-      dilate->Modified();
       hdilate->Modified();
       }
       
