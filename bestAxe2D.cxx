@@ -36,6 +36,8 @@ int main(int, char * argv[])
   
   long radMax = 20;
  
+  std::cout << "x"<<"\t "<< "y" << "\t" << "hd" << "\t" << "p/t" << std::endl;
+
   for( int x=0; x<=radMax; x++)
     {
     itk::TimeProbe htime;
@@ -64,7 +66,7 @@ int main(int, char * argv[])
       hdilate->Modified();
       }
       
-    std::cout << x<<"\tx "<<y << "\t" << htime.GetMeanTime() << std::endl;
+    std::cout << x<<"\tx "<<y << "\t" << htime.GetMeanTime() << "\t" << hdilate->GetPixelsPerTranslation() << std::endl;
     }
   
   
@@ -97,7 +99,7 @@ int main(int, char * argv[])
       hdilate->Modified();
       }
       
-    std::cout << x<<"\tx "<<y << "\t" << htime.GetMeanTime() << std::endl;
+    std::cout << x<<"\tx "<<y << "\t" << htime.GetMeanTime() << "\t" << hdilate->GetPixelsPerTranslation() << std::endl;
     }
   
   
