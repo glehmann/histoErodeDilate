@@ -5,6 +5,7 @@
 #include "itkTimeProbe.h"
 #include <vector>
 #include "itkMultiThreader.h"
+#include <iomanip>
 
 int main(int, char * argv[])
 {
@@ -36,7 +37,11 @@ int main(int, char * argv[])
   
   long radMax = 20;
  
-  std::cout << "x"<<"\t "<< "y" << "\t" << "hd" << "\t" << "p/t" << std::endl;
+  std::cout << "#rx" << "\t" 
+    << "ry" << "\t"
+    << "n" << "\t"
+    << "p/t" << "\t"
+    << "hd" << std::endl;
 
   for( int x=0; x<=radMax; x++)
     {
@@ -66,7 +71,12 @@ int main(int, char * argv[])
       hdilate->Modified();
       }
       
-    std::cout << x<<"\tx "<<y << "\t" << htime.GetMeanTime() << "\t" << hdilate->GetPixelsPerTranslation() << std::endl;
+    std::cout << std::setprecision(3)
+      << x << "\t"
+      << y << "\t"
+      << (2*x+1)*(2*y+1) << "\t"
+      << hdilate->GetPixelsPerTranslation() << "\t"
+      << htime.GetMeanTime() << std::endl;
     }
   
   
@@ -99,7 +109,12 @@ int main(int, char * argv[])
       hdilate->Modified();
       }
       
-    std::cout << x<<"\tx "<<y << "\t" << htime.GetMeanTime() << "\t" << hdilate->GetPixelsPerTranslation() << std::endl;
+    std::cout << std::setprecision(3)
+      << x << "\t"
+      << y << "\t"
+      << (2*x+1)*(2*y+1) << "\t"
+      << hdilate->GetPixelsPerTranslation() << "\t"
+      << htime.GetMeanTime() << std::endl;
     }
   
   
