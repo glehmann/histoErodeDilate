@@ -112,6 +112,13 @@ protected:
 
   void PrintSelf(std::ostream& os, Indent indent) const;
 
+  /** NewHistogram must return an histogram object. It's also the good place to 
+   * pass parameters to the histogram.
+   * A default version is provided which just create a new Historgram and return
+   * it.
+   */
+  virtual THistogram NewHistogram();
+
   /** kernel or structuring element to use. */
   KernelType m_Kernel ;
 

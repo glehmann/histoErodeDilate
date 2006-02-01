@@ -38,6 +38,16 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
 
 
 template<class TInputImage, class TOutputImage, class TKernel, class THistogram>
+THistogram
+MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
+::NewHistogram()
+{
+  return THistogram();
+}
+
+
+
+template<class TInputImage, class TOutputImage, class TKernel, class THistogram>
 void
 MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
 ::GenerateInputRequestedRegion()
@@ -227,7 +237,7 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
     ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels());
     
     // instanciate the histogram
-    THistogram histogram;
+    THistogram histogram = this->NewHistogram();
 
     OutputImageType* outputImage = this->GetOutput();
     const InputImageType* inputImage = this->GetInput();
