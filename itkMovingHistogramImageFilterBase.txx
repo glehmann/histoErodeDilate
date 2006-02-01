@@ -199,20 +199,17 @@ MovingHistogramImageFilterBase< TInputImage, TOutputImage, TKernel>
     }
     
     // search for the best axe
-    typedef typename std::multimap<DirCostType, int, CompCount > MapCountType;
+    typedef typename std::set<DirectionCost> MapCountType;
     MapCountType invertedCount;
     for( int i=0; i<ImageDimension; i++ )
       {
-      DirCostType V;
-      V.count = axeCount[i];
-      V.dimension=i;
-      invertedCount.insert( typename MapCountType::value_type( V, i ) );
+      invertedCount.insert( DirectionCost( i, axeCount[i] ) );
       }
 
     int i=0;
-    for( typename MapCountType::iterator it=invertedCount.begin(); it!=invertedCount.end(); it++, i++ )
+    for( typename MapCountType::iterator it=invertedCount.begin(); it!=invertedCount.end(); it++, i++)
       {
-      m_Axes[i] = it->second;
+      m_Axes[i] = it->m_Dimension;
       }
 
     m_PixelsPerTranslation = axeCount[m_Axes[ImageDimension - 1]] / 2;  // divided by 2 because there is 2 directions on the axe

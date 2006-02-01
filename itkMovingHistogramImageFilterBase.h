@@ -20,6 +20,7 @@
 #include "itkImageToImageFilter.h"
 #include <list>
 #include <map>
+#include <set>
 #include "itkOffsetLexicographicCompare.h"
 
 namespace itk {
@@ -124,25 +125,30 @@ private:
   MovingHistogramImageFilterBase(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
-  typedef struct {
-    int dimension, count;
-  } DirCostType;
+  class DirectionCost {
+    public :
+    DirectionCost( int dimension, int count )
+      {
+      m_Dimension = dimension;
+      m_Count = count;
+      }
+    
+    /**
+     * return true if the object is worst choice for the best axe
+     * than the object in parameter
+     */
+    inline bool operator< ( const DirectionCost &dc ) const
+      {
+      if( m_Count > dc.m_Count )
+        { return true; }
+      else if( m_Count < dc.m_Count )
+	{ return false; }
+      else //if (m_Count == dc.m_Count) 
+	{ return m_Dimension > dc.m_Dimension; }
+      }
 
-  class CompCount 
-  {
-  public:
-    CompCount(){};
-    ~CompCount(){};
-
-    inline int operator()(const DirCostType &A, const DirCostType &B)
-    {
-      int res = A.count - B.count;
-      if (res == 0) 
-	{
-	res = B.dimension - A.dimension;
-	}
-      return res;
-    }
+    int m_Dimension;
+    int m_Count;
   };
 
 } ; // end of class
