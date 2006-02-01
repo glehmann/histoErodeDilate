@@ -18,12 +18,6 @@
 #define __itkMovingHistogramMorphologyImageFilter_txx
 
 #include "itkMovingHistogramMorphologyImageFilter.h"
-#include "itkImageRegionIteratorWithIndex.h"
-#include "itkImageRegionIterator.h"
-#include "itkImageRegionConstIteratorWithIndex.h"
-#include "itkImageLinearConstIteratorWithIndex.h"
-#include "itkOffset.h"
-#include "itkProgressReporter.h"
 #include "itkNumericTraits.h"
 
 
