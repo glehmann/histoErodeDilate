@@ -23,7 +23,7 @@
 #include <set>
 #include "itkOffsetLexicographicCompare.h"
 
-#define zigzag 1
+// #define zigzag
 
 namespace itk {
 
@@ -137,7 +137,7 @@ protected:
 
 #ifndef zigzag
   // declare the type used to store the histogram
-  typedef typename std::map< PixelType, unsigned long, TCompare > HistogramType;
+  typedef THistogram HistogramType;
 
   void pushHistogram(HistogramType &histogram, 
 		     const OffsetListType* addedList,
@@ -146,8 +146,6 @@ protected:
 		     const RegionType &kernRegion,
 		     const InputImageType* inputImage,
 		     const IndexType currentIdx);
-
-  void cleanHistogram(HistogramType &histogram);
 
   void printHist(const HistogramType &H);
 
