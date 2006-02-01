@@ -18,20 +18,17 @@
 #define __itkMovingHistogramMorphologicalGradientImageFilter_h
 
 #include "itkMovingHistogramImageFilter.h"
-#include "itkMovingHistogramImageFilterBase.h"
-#include <list>
 #include <map>
-#include "itkOffsetLexicographicCompare.h"
 
 namespace itk {
 
 namespace Function {
 template <class TInputPixel>
-class MorphologicalGradientFunctor
+class MorphologicalGradientHistogram
 {
 public:
-  MorphologicalGradientFunctor(){}
-  ~MorphologicalGradientFunctor(){}
+  MorphologicalGradientHistogram(){}
+  ~MorphologicalGradientHistogram(){}
 
   typedef typename std::map< TInputPixel, unsigned long > HistogramType;
 
@@ -41,6 +38,45 @@ public:
       { return histogram.rbegin()->first - histogram.begin()->first; }
     return 0;
   }
+
+  inline void AddBoundary() {}
+
+  inline void RemoveBoundary() {}
+
+  inline void AddPixel( const TInputPixel &p )
+    { m_Map[ p ]++; }
+
+  inline void RemovePixel( const TInputPixel &p )
+    { m_Map[ p ]--; }
+
+  inline TInputPixel GetValue()
+    {
+    // clean the map
+    typename HistogramType::iterator mapIt = m_Map.begin();
+    while( mapIt != m_Map.end() )
+      {
+      if( mapIt->second == 0 )
+        { 
+        // this value must be removed from the histogram
+        // The value must be stored and the iterator updated before removing the value
+        // or the iterator is invalidated.
+        TInputPixel toErase = mapIt->first;
+        mapIt++;
+        m_Map.erase(toErase);
+        }
+      else
+        {
+        mapIt++;
+        }
+      }
+
+    // and return the value
+    if( !m_Map.empty() )
+      { return m_Map.rbegin()->first - m_Map.begin()->first; }
+    return 0;
+    }
+
+  HistogramType m_Map;
 };
 } // end namespace Function
 
@@ -61,13 +97,13 @@ public:
 template<class TInputImage, class TOutputImage, class TKernel>
 class ITK_EXPORT MovingHistogramMorphologicalGradientImageFilter : 
     public MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel,
-      typename  Function::MorphologicalGradientFunctor< typename TInputImage::PixelType >,
-      typename Function::MorphologicalGradientFunctor< typename TInputImage::PixelType >::HistogramType >
+      typename  Function::MorphologicalGradientHistogram< typename TInputImage::PixelType > >
 {
 public:
   /** Standard class typedefs. */
   typedef MovingHistogramMorphologicalGradientImageFilter Self;
-  typedef ImageToImageFilter<TInputImage,TOutputImage>  Superclass;
+  typedef MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel,
+      typename  Function::MorphologicalGradientHistogram< typename TInputImage::PixelType > >  Superclass;
   typedef SmartPointer<Self>        Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
   
