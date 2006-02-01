@@ -8,6 +8,8 @@ INCLUDE(IJMacros.txt)
 ENABLE_TESTING()
 INCLUDE(Dart)
 
+FIND_PROGRAM(IMAGE_COMPARE ImageCompare)
+
 #Declare any external dependencies that your project may have here.
 #examples include: ITK, VTK, JPEG, PNG, OpenGL, ZLIB, Perl, Java
 #If you're not sure what name to use, look in the Modules directory of your
@@ -132,31 +134,31 @@ TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 #any tests you can comment out or delete the following line.
 
 ADD_TEST(Dilate2D dilate2D ${CMAKE_SOURCE_DIR}/images/cthead1.png bdilate2D.png hdilate2D.png)
-ADD_TEST(Dilate2DCompare ImageCompare bdilate2D.png hdilate2D.png)
+ADD_TEST(Dilate2DCompare ${IMAGE_COMPARE} bdilate2D.png hdilate2D.png)
 
 ADD_TEST(Dilate3D dilate3D ${CMAKE_SOURCE_DIR}/images/ESCells.hdr bdilate3D.tif hdilate3D.tif)
-ADD_TEST(Dilate3DCompare ImageCompare bdilate3D.tif hdilate3D.tif)
+ADD_TEST(Dilate3DCompare ${IMAGE_COMPARE} bdilate3D.tif hdilate3D.tif)
 
 ADD_TEST(Erode2D erode2D ${CMAKE_SOURCE_DIR}/images/cthead1.png berode2D.png herode2D.png)
-ADD_TEST(Erode2DCompare ImageCompare berode2D.png herode2D.png)
+ADD_TEST(Erode2DCompare ${IMAGE_COMPARE} berode2D.png herode2D.png)
 
 ADD_TEST(Erode3D erode3D ${CMAKE_SOURCE_DIR}/images/ESCells.hdr berode3D.tif herode3D.tif)
-ADD_TEST(Erode3DCompare ImageCompare berode3D.tif herode3D.tif)
+ADD_TEST(Erode3DCompare ${IMAGE_COMPARE} berode3D.tif herode3D.tif)
 
 ADD_TEST(Gradient2D gradient2D ${CMAKE_SOURCE_DIR}/images/cthead1.png bgradient2D.png hgradient2D.png)
-ADD_TEST(Gradient2DCompare ImageCompare bgradient2D.png hgradient2D.png)
+ADD_TEST(Gradient2DCompare ${IMAGE_COMPARE} bgradient2D.png hgradient2D.png)
 
 ADD_TEST(Gradient3D gradient3D ${CMAKE_SOURCE_DIR}/images/ESCells.hdr bgradient3D.tif hgradient3D.tif)
-ADD_TEST(Gradient3DCompare ImageCompare bgradient3D.tif hgradient3D.tif)
+ADD_TEST(Gradient3DCompare ${IMAGE_COMPARE} bgradient3D.tif hgradient3D.tif)
 
 ADD_TEST(KernelException kernelException)
 
 ADD_TEST(MetaErode2D metaErode2D ${CMAKE_SOURCE_DIR}/images/cthead1.png bmetaErode2D.png hmetaErode2D.png)
-ADD_TEST(MetaErode2DCompare ImageCompare bmetaErode2D.png hmetaErode2D.png)
+ADD_TEST(MetaErode2DCompare ${IMAGE_COMPARE} bmetaErode2D.png hmetaErode2D.png)
 
 ADD_TEST(MetaDilate2D metaDilate2D ${CMAKE_SOURCE_DIR}/images/cthead1.png bmetaDilate2D.png hmetaDilate2D.png)
-ADD_TEST(MetaDilate2DCompare ImageCompare bmetaDilate2D.png hmetaDilate2D.png)
+ADD_TEST(MetaDilate2DCompare ${IMAGE_COMPARE} bmetaDilate2D.png hmetaDilate2D.png)
 
 ADD_TEST(MetaGradient2D metaGradient2D ${CMAKE_SOURCE_DIR}/images/cthead1.png bmetaGradient2D.png hmetaGradient2D.png)
-ADD_TEST(MetaGradient2DCompare ImageCompare bmetaGradient2D.png hmetaGradient2D.png)
+ADD_TEST(MetaGradient2DCompare ${IMAGE_COMPARE} bmetaGradient2D.png hmetaGradient2D.png)
 
