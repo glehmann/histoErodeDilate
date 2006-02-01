@@ -124,7 +124,10 @@ public:
   typedef typename TInputImage::OffsetType OffsetType ;
   typedef typename Superclass::OutputImageRegionType OutputImageRegionType;
   typedef typename TOutputImage::PixelType OutputPixelType ;
-  
+
+  typedef typename Function::MorphologicalGradientHistogram< PixelType > HistogramType;
+
+
   /** Image related typedefs. */
   itkStaticConstMacro(ImageDimension, unsigned int,
                       TInputImage::ImageDimension);
