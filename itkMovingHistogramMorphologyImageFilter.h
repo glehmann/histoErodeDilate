@@ -172,30 +172,6 @@ private:
   MovingHistogramMorphologyImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
-// #if 1
-//   // declare the type used to store the histogram
-//   typedef typename std::map< PixelType, unsigned long, TCompare > HistogramType;
-// 
-//   void pushHistogram(HistogramType &histogram, 
-// 		     const OffsetListType* addedList,
-// 		     const OffsetListType* removedList,
-// 		     const RegionType &inputRegion,
-// 		     const RegionType &kernRegion,
-// 		     const InputImageType* inputImage,
-// 		     const IndexType currentIdx);
-// 
-//   void cleanHistogram(HistogramType &histogram);
-// 
-//   void printHist(const HistogramType &H);
-// 
-//   void GetDirAndOffset(const IndexType LineStart, 
-// 		       const IndexType PrevLineStart,
-// 		       const int ImageDimension,
-// 		       OffsetType &LineOffset,
-// 		       int &LineDirection);
-// 
-// #endif
-
 } ; // end of class
 
 } // end namespace itk

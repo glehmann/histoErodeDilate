@@ -228,7 +228,7 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
 }
 
 
-
+#ifdef zigzag
 template<class TInputImage, class TOutputImage, class TKernel, class THistogram>
 void
 MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
@@ -351,6 +351,265 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
         }
       }
 }
+
+
+#else
+// a modified version that uses line iterators and only moves the
+// histogram in one direction. Hopefully it will be a bit simpler and
+// faster due to improved memory access and a tighter loop.
+template<class TInputImage, class TOutputImage, class TKernel, class TCompare>
+void
+MovingHistogramMorphologyImageFilter<TInputImage, TOutputImage, TKernel, TCompare>
+::ThreadedGenerateData(const OutputImageRegionType& outputRegionForThread,
+                       int threadId) 
+{
+    
+    // instanciate the histogram
+    HistogramType histogram;
+    
+    OutputImageType* outputImage = this->GetOutput();
+    const InputImageType* inputImage = this->GetInput();
+    RegionType inputRegion = inputImage->GetRequestedRegion();
+    
+    // initialize the histogram
+    for( typename OffsetListType::iterator listIt = this->m_KernelOffsets.begin(); listIt != this->m_KernelOffsets.end(); listIt++ )
+      {
+      IndexType idx = outputRegionForThread.GetIndex() + (*listIt);
+      if( inputRegion.IsInside( idx ) )
+        { histogram[inputImage->GetPixel(idx)]++; }
+      else
+        { histogram[m_Boundary]++; }
+      }
+
+    // now move the histogram
+    itk::FixedArray<short, ImageDimension> direction;
+    direction.Fill(1);
+    IndexType currentIdx = outputRegionForThread.GetIndex();
+    int axe = ImageDimension - 1;
+    OffsetType offset;
+    offset.Fill( 0 );
+    RegionType stRegion;
+    stRegion.SetSize( this->m_Kernel.GetSize() );
+    stRegion.PadByRadius( 1 ); // must pad the region by one because of the translation
+
+    OffsetType centerOffset;
+    for( int axe=0; axe<ImageDimension; axe++)
+      { centerOffset[axe] = stRegion.GetSize()[axe] / 2; }
+
+    int BestDirection = this->m_Axes[axe];
+    // Report progress every line instead of every pixel
+    ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels()/outputRegionForThread.GetSize()[BestDirection]);
+    // init the offset and get the lists for the best axe
+    offset[BestDirection] = direction[BestDirection];
+    // it's very important for performances to get a pointer and not a copy
+    const OffsetListType* addedList = &this->m_AddedOffsets[offset];;
+    const OffsetListType* removedList = &this->m_RemovedOffsets[offset];
+
+    typedef typename itk::ImageLinearConstIteratorWithIndex<InputImageType> InputLineIteratorType;
+    InputLineIteratorType InLineIt(inputImage, outputRegionForThread);
+    InLineIt.SetDirection(BestDirection);
+    
+    typedef typename itk::ImageRegionIterator<OutputImageType> OutputIteratorType;
+    //OutputIteratorType oit(outputImage, outputRegionForThread);
+    InLineIt.GoToBegin();
+    IndexType LineStart;
+    //PrevLineStart = InLineIt.GetIndex();
+    InLineIt.GoToBegin();
+
+    typedef typename std::vector<HistogramType> HistVecType;
+    HistVecType HistVec(ImageDimension);
+    typedef typename std::vector<IndexType> IndexVecType;
+    IndexVecType PrevLineStartVec(ImageDimension);
+
+    for (int i=0;i<ImageDimension;i++)
+      {
+      HistVec[i] = histogram;
+      PrevLineStartVec[i] = InLineIt.GetIndex();
+      }
+
+    while(!InLineIt.IsAtEnd())
+      {
+      HistogramType *histRef = &(HistVec[BestDirection]);
+//      PrevLineStart = InLineIt.GetIndex();
+      for (InLineIt.GoToBeginOfLine(); !InLineIt.IsAtEndOfLine(); ++InLineIt)
+	{
+	
+	// Update the historgram
+	IndexType currentIdx = InLineIt.GetIndex();
+	outputImage->SetPixel(currentIdx, static_cast< OutputPixelType >( histRef->begin()->first ));
+	stRegion.SetIndex( currentIdx - centerOffset );
+	pushHistogram(*histRef, addedList, removedList, inputRegion, 
+		      stRegion, inputImage, currentIdx);
+
+	cleanHistogram(*histRef);
+	}
+      InLineIt.NextLine();
+      if (InLineIt.IsAtEnd())
+	{
+	break;
+	}
+      LineStart = InLineIt.GetIndex();
+      // This section updates the histogram for the next line
+      // Since we aren't zig zagging we need to figure out which
+      // histogram to update and the direction in which to push
+      // it. Then we need to copy that histogram to the relevant
+      // places
+      OffsetType LineOffset;
+      // Figure out which stored histogram to move and in
+      // which direction
+      int LineDirection;
+      IndexType PrevLineStart = PrevLineStartVec[BestDirection];
+
+      // This function deals with changing planes etc
+      GetDirAndOffset(LineStart, PrevLineStart, ImageDimension,
+		      LineOffset, LineDirection);
+
+      const OffsetListType* addedListLine = &this->m_AddedOffsets[LineOffset];;
+      const OffsetListType* removedListLine = &this->m_RemovedOffsets[LineOffset];
+      HistogramType *tmpHist = &(HistVec[LineDirection]);
+      stRegion.SetIndex(PrevLineStartVec[LineDirection] - centerOffset);
+      // Now move the histogram
+      pushHistogram(*tmpHist, addedListLine, removedListLine, inputRegion, 
+		    stRegion, inputImage, PrevLineStartVec[LineDirection]);
+
+      cleanHistogram(*tmpHist);
+      PrevLineStartVec[LineDirection] = LineStart;
+      // copy the updated histogram and line start entries to the
+      // relevant directions. When updating direction 2, for example,
+      // new copies of directions 0 and 1 should be made.
+      for (int i=0;i<ImageDimension;i++) 
+	{
+	int idx = this->m_Axes[i];
+	if (idx< LineDirection)
+	  {
+	  PrevLineStartVec[idx] = LineStart;
+	  HistVec[idx] = HistVec[LineDirection];
+	  }
+	}
+      progress.CompletedPixel();
+      }
+
+}
+
+template<class TInputImage, class TOutputImage, class TKernel, class TCompare>
+void
+MovingHistogramMorphologyImageFilter<TInputImage, TOutputImage, TKernel, TCompare>
+::pushHistogram(HistogramType &histogram, 
+		const OffsetListType* addedList,
+		const OffsetListType* removedList,
+		const RegionType &inputRegion,
+		const RegionType &kernRegion,
+		const InputImageType* inputImage,
+		const IndexType currentIdx)
+{
+
+  if( inputRegion.IsInside( kernRegion ) )
+    {
+    // update the histogram
+    for( typename OffsetListType::const_iterator addedIt = addedList->begin(); addedIt != addedList->end(); addedIt++ )
+      { 
+      histogram[ inputImage->GetPixel( currentIdx + (*addedIt) ) ]++; 
+      }
+    for( typename OffsetListType::const_iterator removedIt = removedList->begin(); removedIt != removedList->end(); removedIt++ )
+      { 
+      histogram[ inputImage->GetPixel( currentIdx + (*removedIt) ) ]--; 
+      }
+    }
+  else
+    {
+    // update the histogram
+    for( typename OffsetListType::const_iterator addedIt = addedList->begin(); addedIt != addedList->end(); addedIt++ )
+      {
+      IndexType idx = currentIdx + (*addedIt);
+      if( inputRegion.IsInside( idx ) )
+	{ histogram[inputImage->GetPixel( idx )]++; }
+      else
+	{ histogram[m_Boundary]++; }
+      }
+    for( typename OffsetListType::const_iterator removedIt = removedList->begin(); removedIt != removedList->end(); removedIt++ )
+      {
+      IndexType idx = currentIdx + (*removedIt);
+      if( inputRegion.IsInside( idx ) )
+	{ histogram[ inputImage->GetPixel( idx ) ]--; }
+      else
+	{ histogram[m_Boundary]--; }
+      }
+    }
+}
+
+template<class TInputImage, class TOutputImage, class TKernel, class TCompare>
+void
+MovingHistogramMorphologyImageFilter<TInputImage, TOutputImage, TKernel, TCompare>
+::cleanHistogram(HistogramType &histogram)
+{
+  // Remove empty entries from the start of the histogram
+  typename HistogramType::iterator mapIt = histogram.begin();
+  while( mapIt != histogram.end() )
+    {
+    if( mapIt->second == 0 )
+      { 
+      // this value must be removed from the histogram
+      // The value must be stored and the iterator updated before removing the value
+      // or the iterator is invalidated.
+      typename HistogramType::iterator toErase = mapIt;
+      mapIt++;
+      histogram.erase(toErase);
+      }
+    else
+      {
+      //mapIt++;
+      // don't remove all the zero value found, just remove the one before the current maximum value
+      // the histogram may become quite big on real type image, but it's an important increase of performances
+      break;
+      }
+    }
+  
+  // histogram is fully up-to-date
+}
+
+template<class TInputImage, class TOutputImage, class TKernel, class TCompare>
+void
+MovingHistogramMorphologyImageFilter<TInputImage, TOutputImage, TKernel, TCompare>
+::printHist(const HistogramType &H)
+{
+  std::cout << "Hist = " ;
+  typename HistogramType::const_iterator mapIt;
+  for (mapIt = H.begin(); mapIt != H.end(); mapIt++) 
+    {
+    std::cout << "V= " << int(mapIt->first) << " C= " << int(mapIt->second) << " ";
+    }
+  std::cout << std::endl;
+}
+
+template<class TInputImage, class TOutputImage, class TKernel, class TCompare>
+void 
+MovingHistogramMorphologyImageFilter<TInputImage, TOutputImage, TKernel, TCompare>
+::GetDirAndOffset(const IndexType LineStart, 
+		  const IndexType PrevLineStart,
+		  const int ImageDimension,
+		  OffsetType &LineOffset,
+		  int &LineDirection)
+{
+  // when moving between lines in the same plane there should be only
+  // 1 non zero (positive) entry in LineOffset.
+  // When moving between planes there will be some negative ones too.
+  LineOffset = LineStart - PrevLineStart;
+  for (int y=0;y<ImageDimension;y++) 
+    {
+    if (LineOffset[y] > 0)
+      {
+      LineOffset[y]=1;  // should be 1 anyway
+      LineDirection=y;
+      }
+    else
+      {
+      LineOffset[y]=0;
+      }
+    }
+}
+
+#endif
+
 
 template<class TInputImage, class TOutputImage, class TKernel, class THistogram>
 void

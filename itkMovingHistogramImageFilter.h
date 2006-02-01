@@ -23,6 +23,8 @@
 #include <set>
 #include "itkOffsetLexicographicCompare.h"
 
+#define zigzag 1
+
 namespace itk {
 
 /**
@@ -132,6 +134,30 @@ protected:
   typename itk::FixedArray< int, ImageDimension > m_Axes;
 
   unsigned long m_PixelsPerTranslation;
+
+#ifndef zigzag
+  // declare the type used to store the histogram
+  typedef typename std::map< PixelType, unsigned long, TCompare > HistogramType;
+
+  void pushHistogram(HistogramType &histogram, 
+		     const OffsetListType* addedList,
+		     const OffsetListType* removedList,
+		     const RegionType &inputRegion,
+		     const RegionType &kernRegion,
+		     const InputImageType* inputImage,
+		     const IndexType currentIdx);
+
+  void cleanHistogram(HistogramType &histogram);
+
+  void printHist(const HistogramType &H);
+
+  void GetDirAndOffset(const IndexType LineStart, 
+		       const IndexType PrevLineStart,
+		       const int ImageDimension,
+		       OffsetType &LineOffset,
+		       int &LineDirection);
+
+#endif
 
 private:
   MovingHistogramImageFilter(const Self&); //purposely not implemented
