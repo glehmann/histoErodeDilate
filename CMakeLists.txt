@@ -131,32 +131,32 @@ TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 #for this test.  Include as many tests as you like.  If your project doesn't have
 #any tests you can comment out or delete the following line.
 
-ADD_TEST(Dilate2D dilate2D ${CMAKE_SOURCE_DIR}/cthead1.tif bdilate2D.tif hdilate2D.tif)
-ADD_TEST(Dilate2DCompare ImageCompare bdilate2D.tif hdilate2D.tif)
+ADD_TEST(Dilate2D dilate2D ${CMAKE_SOURCE_DIR}/images/cthead1.png bdilate2D.png hdilate2D.png)
+ADD_TEST(Dilate2DCompare ImageCompare bdilate2D.png hdilate2D.png)
 
-ADD_TEST(Dilate3D dilate3D ${CMAKE_SOURCE_DIR}/ESCells.hdr bdilate3D.tif hdilate3D.tif)
+ADD_TEST(Dilate3D dilate3D ${CMAKE_SOURCE_DIR}/images/ESCells.hdr bdilate3D.tif hdilate3D.tif)
 ADD_TEST(Dilate3DCompare ImageCompare bdilate3D.tif hdilate3D.tif)
 
-ADD_TEST(Erode2D erode2D ${CMAKE_SOURCE_DIR}/cthead1.tif berode2D.tif herode2D.tif)
-ADD_TEST(Erode2DCompare ImageCompare berode2D.tif herode2D.tif)
+ADD_TEST(Erode2D erode2D ${CMAKE_SOURCE_DIR}/images/cthead1.png berode2D.png herode2D.png)
+ADD_TEST(Erode2DCompare ImageCompare berode2D.png herode2D.png)
 
-ADD_TEST(Erode3D erode3D ${CMAKE_SOURCE_DIR}/ESCells.hdr berode3D.tif herode3D.tif)
+ADD_TEST(Erode3D erode3D ${CMAKE_SOURCE_DIR}/images/ESCells.hdr berode3D.tif herode3D.tif)
 ADD_TEST(Erode3DCompare ImageCompare berode3D.tif herode3D.tif)
 
-ADD_TEST(Gradient2D gradient2D ${CMAKE_SOURCE_DIR}/cthead1.tif bgradient2D.tif hgradient2D.tif)
-ADD_TEST(Gradient2DCompare ImageCompare bgradient2D.tif hgradient2D.tif)
+ADD_TEST(Gradient2D gradient2D ${CMAKE_SOURCE_DIR}/images/cthead1.png bgradient2D.png hgradient2D.png)
+ADD_TEST(Gradient2DCompare ImageCompare bgradient2D.png hgradient2D.png)
 
-ADD_TEST(Gradient3D gradient3D ${CMAKE_SOURCE_DIR}/ESCells.hdr bgradient3D.tif hgradient3D.tif)
+ADD_TEST(Gradient3D gradient3D ${CMAKE_SOURCE_DIR}/images/ESCells.hdr bgradient3D.tif hgradient3D.tif)
 ADD_TEST(Gradient3DCompare ImageCompare bgradient3D.tif hgradient3D.tif)
 
 ADD_TEST(KernelException kernelException)
 
-ADD_TEST(MetaErode2D metaErode2D ${CMAKE_SOURCE_DIR}/cthead1.tif bmetaErode2D.tif hmetaErode2D.tif)
-ADD_TEST(MetaErode2DCompare ImageCompare bmetaErode2D.tif hmetaErode2D.tif)
+ADD_TEST(MetaErode2D metaErode2D ${CMAKE_SOURCE_DIR}/images/cthead1.png bmetaErode2D.png hmetaErode2D.png)
+ADD_TEST(MetaErode2DCompare ImageCompare bmetaErode2D.png hmetaErode2D.png)
 
-ADD_TEST(MetaDilate2D metaDilate2D ${CMAKE_SOURCE_DIR}/cthead1.tif bmetaDilate2D.tif hmetaDilate2D.tif)
-ADD_TEST(MetaDilate2DCompare ImageCompare bmetaDilate2D.tif hmetaDilate2D.tif)
+ADD_TEST(MetaDilate2D metaDilate2D ${CMAKE_SOURCE_DIR}/images/cthead1.png bmetaDilate2D.png hmetaDilate2D.png)
+ADD_TEST(MetaDilate2DCompare ImageCompare bmetaDilate2D.png hmetaDilate2D.png)
 
-ADD_TEST(MetaGradient2D metaGradient2D ${CMAKE_SOURCE_DIR}/cthead1.tif bmetaGradient2D.tif hmetaGradient2D.tif)
-ADD_TEST(MetaGradient2DCompare ImageCompare bmetaGradient2D.tif hmetaGradient2D.tif)
+ADD_TEST(MetaGradient2D metaGradient2D ${CMAKE_SOURCE_DIR}/images/cthead1.png bmetaGradient2D.png hmetaGradient2D.png)
+ADD_TEST(MetaGradient2DCompare ImageCompare bmetaGradient2D.png hmetaGradient2D.png)
 
