@@ -17,12 +17,80 @@
 #ifndef __itkMovingHistogramMorphologyImageFilter_h
 #define __itkMovingHistogramMorphologyImageFilter_h
 
-#include "itkMovingHistogramImageFilterBase.h"
+#include "itkMovingHistogramImageFilter.h"
 #include <list>
 #include <map>
 #include "itkOffsetLexicographicCompare.h"
 
 namespace itk {
+
+namespace Function {
+template <class TInputPixel, class TCompare>
+class MorphologyHistogram
+{
+public:
+  MorphologyHistogram(){}
+  ~MorphologyHistogram(){}
+
+  typedef typename std::map< TInputPixel, unsigned long, TCompare > HistogramType;
+
+  inline TInputPixel operator()( const HistogramType &histogram )
+  {
+    if( !histogram.empty() )
+      { return histogram.rbegin()->first - histogram.begin()->first; }
+    return 0;
+  }
+
+  inline void AddBoundary()
+    { m_Map[ m_Boundary ]++; }
+
+  inline void RemoveBoundary()
+    { m_Map[ m_Boundary ]--; }
+
+  inline void AddPixel( const TInputPixel &p )
+    { m_Map[ p ]++; }
+
+  inline void RemovePixel( const TInputPixel &p )
+    { m_Map[ p ]--; }
+
+  inline TInputPixel GetValue()
+    {
+    // clean the map
+    typename HistogramType::iterator mapIt = m_Map.begin();
+    while( mapIt != m_Map.end() )
+      {
+      if( mapIt->second == 0 )
+        { 
+        // this value must be removed from the histogram
+        // The value must be stored and the iterator updated before removing the value
+        // or the iterator is invalidated.
+        TInputPixel toErase = mapIt->first;
+        mapIt++;
+        m_Map.erase( toErase );
+        }
+      else
+        {
+        mapIt++;
+        // don't remove all the zero value found, just remove the one before the current maximum value
+        // the histogram may become quite big on real type image, but it's an important increase of performances
+        break;
+        }
+      }
+
+    // and return the value
+    return m_Map.begin()->first;
+    }
+
+  void SetBoundary( const TInputPixel & val )
+    { m_Boundary = val; }
+
+  HistogramType m_Map;
+
+  TInputPixel m_Boundary;
+};
+} // end namespace Function
+
+
 
 /**
  * \class MovingHistogramMorphologyImageFilter
@@ -35,14 +103,14 @@ namespace itk {
  * \ingroup ImageEnhancement  MathematicalMorphologyImageFilters
  */
 
-template<class TInputImage, class TOutputImage, class TKernel, class TCompare>
+template<class TInputImage, class TOutputImage, class TKernel, class THistogram>
 class ITK_EXPORT MovingHistogramMorphologyImageFilter : 
-    public MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel>
+    public MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
 {
 public:
   /** Standard class typedefs. */
   typedef MovingHistogramMorphologyImageFilter Self;
-  typedef MovingHistogramImageFilterBase<TInputImage, TOutputImage, TKernel> Superclass;
+  typedef MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram> Superclass;
   typedef SmartPointer<Self>        Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
   
@@ -91,9 +159,12 @@ protected:
   void PrintSelf(std::ostream& os, Indent indent) const;
   
   /** Multi-thread version GenerateData. */
-  void  ThreadedGenerateData (const OutputImageRegionType& 
-                              outputRegionForThread,
-                              int threadId) ;
+//   void  ThreadedGenerateData (const OutputImageRegionType& 
+//                               outputRegionForThread,
+//                               int threadId) ;
+
+  /** needed to pass the boundary value to the histogram object */
+  virtual THistogram NewHistogram();
 
   PixelType m_Boundary;
 
@@ -101,29 +172,29 @@ private:
   MovingHistogramMorphologyImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
-#if 1
-  // declare the type used to store the histogram
-  typedef typename std::map< PixelType, unsigned long, TCompare > HistogramType;
-
-  void pushHistogram(HistogramType &histogram, 
-		     const OffsetListType* addedList,
-		     const OffsetListType* removedList,
-		     const RegionType &inputRegion,
-		     const RegionType &kernRegion,
-		     const InputImageType* inputImage,
-		     const IndexType currentIdx);
-
-  void cleanHistogram(HistogramType &histogram);
-
-  void printHist(const HistogramType &H);
-
-  void GetDirAndOffset(const IndexType LineStart, 
-		       const IndexType PrevLineStart,
-		       const int ImageDimension,
-		       OffsetType &LineOffset,
-		       int &LineDirection);
-
-#endif
+// #if 1
+//   // declare the type used to store the histogram
+//   typedef typename std::map< PixelType, unsigned long, TCompare > HistogramType;
+// 
+//   void pushHistogram(HistogramType &histogram, 
+// 		     const OffsetListType* addedList,
+// 		     const OffsetListType* removedList,
+// 		     const RegionType &inputRegion,
+// 		     const RegionType &kernRegion,
+// 		     const InputImageType* inputImage,
+// 		     const IndexType currentIdx);
+// 
+//   void cleanHistogram(HistogramType &histogram);
+// 
+//   void printHist(const HistogramType &H);
+// 
+//   void GetDirAndOffset(const IndexType LineStart, 
+// 		       const IndexType PrevLineStart,
+// 		       const int ImageDimension,
+// 		       OffsetType &LineOffset,
+// 		       int &LineDirection);
+// 
+// #endif
 
 } ; // end of class
 

@@ -18,9 +18,6 @@
 #define __itkMovingHistogramErodeImageFilter_h
 
 #include "itkMovingHistogramMorphologyImageFilter.h"
-#include <list>
-#include <map>
-#include "itkOffsetLexicographicCompare.h"
 
 namespace itk {
 
@@ -43,12 +40,13 @@ namespace itk {
 template<class TInputImage, class TOutputImage, class TKernel>
 class ITK_EXPORT MovingHistogramErodeImageFilter : 
     public MovingHistogramMorphologyImageFilter<TInputImage, TOutputImage, TKernel,
-      typename std::less<typename TInputImage::PixelType>  >
+      typename Function::MorphologyHistogram < typename TInputImage::PixelType, typename std::less<typename TInputImage::PixelType> > >
 {
 public:
   /** Standard class typedefs. */
   typedef MovingHistogramErodeImageFilter Self;
-  typedef ImageToImageFilter<TInputImage,TOutputImage>  Superclass;
+  typedef MovingHistogramMorphologyImageFilter<TInputImage, TOutputImage, TKernel,
+      typename Function::MorphologyHistogram < typename TInputImage::PixelType, typename std::less<typename TInputImage::PixelType> > >  Superclass;
   typedef SmartPointer<Self>        Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
   
