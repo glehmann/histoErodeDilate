@@ -170,7 +170,7 @@ private:
       }
     
     /**
-     * return true if the object is worst choice for the best axe
+     * return true if the object is worst choice for the best axis
      * than the object in parameter
      */
     inline bool operator< ( const DirectionCost &dc ) const

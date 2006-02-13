@@ -110,7 +110,7 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
 ::SetKernel( const KernelType& kernel )
 {
   // first, build the list of offsets of added and removed pixels when the 
-  // structuring element move of 1 pixel on 1 axe; do it for the 2 directions
+  // structuring element move of 1 pixel on 1 axis; do it for the 2 directions
   // on each axes.
   
   // transform the structuring element in an image for an easier
@@ -128,8 +128,8 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
 
   // create a center index to compute the offset
   IndexType centerIndex;
-  for( int axe=0; axe<ImageDimension; axe++)
-    { centerIndex[axe] = kernel.GetSize()[axe] / 2; }
+  for( int axis=0; axis<ImageDimension; axis++)
+    { centerIndex[axis] = kernel.GetSize()[axis] / 2; }
   
   unsigned long count = 0;
   while( !kernelImageIt.IsAtEnd() )
@@ -164,16 +164,16 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
   // store the kernel offset list
   m_KernelOffsets = kernelOffsets;
 
-  typename itk::FixedArray< unsigned long, ImageDimension > axeCount;
-  axeCount.Fill( 0 );
+  typename itk::FixedArray< unsigned long, ImageDimension > axisCount;
+  axisCount.Fill( 0 );
 
-  for( int axe=0; axe<ImageDimension; axe++)
+  for( int axis=0; axis<ImageDimension; axis++)
     {
     OffsetType refOffset;
     refOffset.Fill( 0 );
     for( int direction=-1; direction<=1; direction +=2)
       {
-      refOffset[axe] = direction;
+      refOffset[axis] = direction;
       for( kernelImageIt.GoToBegin(); !kernelImageIt.IsAtEnd(); ++kernelImageIt)
         {
         IndexType idx = kernelImageIt.GetIndex();
@@ -187,13 +187,13 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
             if( !tmpSEImage->GetPixel( nextIdx ) )
               {
                 m_AddedOffsets[refOffset].push_front( nextIdx - centerIndex );
-                axeCount[axe]++;
+                axisCount[axis]++;
               }
             }
           else
             {
               m_AddedOffsets[refOffset].push_front( nextIdx - centerIndex );
-              axeCount[axe]++;
+              axisCount[axis]++;
             }
           // search for removed pixel during a translation
           IndexType prevIdx = idx - refOffset;
@@ -202,13 +202,13 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
             if( !tmpSEImage->GetPixel( prevIdx ) )
               {
                 m_RemovedOffsets[refOffset].push_front( idx - centerIndex );
-                axeCount[axe]++;
+                axisCount[axis]++;
               }
             }
           else
             {
               m_RemovedOffsets[refOffset].push_front( idx - centerIndex );
-              axeCount[axe]++;
+              axisCount[axis]++;
             }
 
           }
@@ -216,12 +216,12 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
       }
     }
     
-    // search for the best axe
+    // search for the best axis
     typedef typename std::set<DirectionCost> MapCountType;
     MapCountType invertedCount;
     for( int i=0; i<ImageDimension; i++ )
       {
-      invertedCount.insert( DirectionCost( i, axeCount[i] ) );
+      invertedCount.insert( DirectionCost( i, axisCount[i] ) );
       }
 
     int i=0;
@@ -230,7 +230,7 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
       m_Axes[i] = it->m_Dimension;
       }
 
-    m_PixelsPerTranslation = axeCount[m_Axes[ImageDimension - 1]] / 2;  // divided by 2 because there is 2 directions on the axe
+    m_PixelsPerTranslation = axisCount[m_Axes[ImageDimension - 1]] / 2;  // divided by 2 because there is 2 directions on the axis
 }
 
 
@@ -266,7 +266,7 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
     itk::FixedArray<short, ImageDimension> direction;
     direction.Fill(1);
     IndexType currentIdx = outputRegionForThread.GetIndex();
-    int axe = ImageDimension - 1;
+    int axis = ImageDimension - 1;
     OffsetType offset;
     offset.Fill( 0 );
     RegionType stRegion;
@@ -274,16 +274,16 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
     stRegion.PadByRadius( 1 ); // must pad the region by one because of the translation
   
     OffsetType centerOffset;
-    for( int axe=0; axe<ImageDimension; axe++)
-      { centerOffset[axe] = stRegion.GetSize()[axe] / 2; }
+    for( int axis=0; axis<ImageDimension; axis++)
+      { centerOffset[axis] = stRegion.GetSize()[axis] / 2; }
 
-    // init the offset and get the lists for the best axe
-    offset[this->m_Axes[axe]] = direction[this->m_Axes[axe]];
+    // init the offset and get the lists for the best axis
+    offset[this->m_Axes[axis]] = direction[this->m_Axes[axis]];
     // it's very important for performances to get a pointer and not a copy
     const OffsetListType* addedList = &this->m_AddedOffsets[offset];;
     const OffsetListType* removedList = &this->m_RemovedOffsets[offset];
 
-    while( axe >= 0 )
+    while( axis >= 0 )
       {
       if( outputRegionForThread.IsInside( currentIdx + offset ) )
         {
@@ -325,12 +325,12 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
         outputImage->SetPixel( currentIdx, value );
         progress.CompletedPixel();
         
-        if( axe != ImageDimension - 1 )
+        if( axis != ImageDimension - 1 )
           {
-          offset[this->m_Axes[axe]] = 0;
-          // the axe must be the last one
-          axe = ImageDimension - 1;
-          offset[this->m_Axes[axe]] = direction[this->m_Axes[axe]];
+          offset[this->m_Axes[axis]] = 0;
+          // the axis must be the last one
+          axis = ImageDimension - 1;
+          offset[this->m_Axes[axis]] = direction[this->m_Axes[axis]];
           addedList = &this->m_AddedOffsets[offset];;
           removedList = &this->m_RemovedOffsets[offset];
           }
@@ -338,19 +338,19 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
       else
         {
         // the next offset is not in the right region,
-        // we need to switch to another axe
+        // we need to switch to another axis
         
-        // invert the direction of the current axe
-        direction[this->m_Axes[axe]] *= -1;
-        // set the offset of the current axe to 0
+        // invert the direction of the current axis
+        direction[this->m_Axes[axis]] *= -1;
+        // set the offset of the current axis to 0
         // -> offset == [0]*dim
-        offset[this->m_Axes[axe]] = 0;
-        // and switch to another axe
-        axe--;
+        offset[this->m_Axes[axis]] = 0;
+        // and switch to another axis
+        axis--;
         
-        if( axe >= 0 )
+        if( axis >= 0 )
           {
-          offset[this->m_Axes[axe]] = direction[this->m_Axes[axe]];
+          offset[this->m_Axes[axis]] = direction[this->m_Axes[axis]];
           addedList = &this->m_AddedOffsets[offset];;
           removedList = &this->m_RemovedOffsets[offset];
           }
@@ -391,7 +391,7 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
     itk::FixedArray<short, ImageDimension> direction;
     direction.Fill(1);
     IndexType currentIdx = outputRegionForThread.GetIndex();
-    int axe = ImageDimension - 1;
+    int axis = ImageDimension - 1;
     OffsetType offset;
     offset.Fill( 0 );
     RegionType stRegion;
@@ -399,13 +399,13 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
     stRegion.PadByRadius( 1 ); // must pad the region by one because of the translation
 
     OffsetType centerOffset;
-    for( int axe=0; axe<ImageDimension; axe++)
-      { centerOffset[axe] = stRegion.GetSize()[axe] / 2; }
+    for( int axis=0; axis<ImageDimension; axis++)
+      { centerOffset[axis] = stRegion.GetSize()[axis] / 2; }
 
-    int BestDirection = this->m_Axes[axe];
+    int BestDirection = this->m_Axes[axis];
     // Report progress every line instead of every pixel
     ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels()/outputRegionForThread.GetSize()[BestDirection]);
-    // init the offset and get the lists for the best axe
+    // init the offset and get the lists for the best axis
     offset[BestDirection] = direction[BestDirection];
     // it's very important for performances to get a pointer and not a copy
     const OffsetListType* addedList = &this->m_AddedOffsets[offset];;

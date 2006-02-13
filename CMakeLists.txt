@@ -55,19 +55,19 @@ ENDIF(BUILD_WRAPPERS)
 #be linked to all the libraries you specified above. 
 #You can build more than one executable per project
 SET(CurrentExe "perf2D")
-ADD_EXECUTABLE(${CurrentExe} perf2D.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "perf3D")
-ADD_EXECUTABLE(${CurrentExe} perf3D.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "perf_threads")
-ADD_EXECUTABLE(${CurrentExe} perf_threads.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "perf_binary")
-ADD_EXECUTABLE(${CurrentExe} perf_binary.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "perf_nb_of_neighbors")
@@ -83,47 +83,47 @@ ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx)
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "dilate2D")
-ADD_EXECUTABLE(${CurrentExe} dilate2D.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "dilate3D")
-ADD_EXECUTABLE(${CurrentExe} dilate3D.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
-SET(CurrentExe "bestAxe2D")
-ADD_EXECUTABLE(${CurrentExe} bestAxe2D.cxx) 
+SET(CurrentExe "perf_dimension")
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "erode2D")
-ADD_EXECUTABLE(${CurrentExe} erode2D.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "erode3D")
-ADD_EXECUTABLE(${CurrentExe} erode3D.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "gradient2D")
-ADD_EXECUTABLE(${CurrentExe} gradient2D.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "gradient3D")
-ADD_EXECUTABLE(${CurrentExe} gradient3D.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "kernelException")
-ADD_EXECUTABLE(${CurrentExe} kernelException.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "metaErode2D")
-ADD_EXECUTABLE(${CurrentExe} metaErode2D.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "metaDilate2D")
-ADD_EXECUTABLE(${CurrentExe} metaDilate2D.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 SET(CurrentExe "metaGradient2D")
-ADD_EXECUTABLE(${CurrentExe} metaGradient2D.cxx) 
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
 #the following line is an example of how to add a test to your project.
