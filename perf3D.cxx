@@ -16,6 +16,7 @@
 #include "itkTimeProbe.h"
 #include <vector>
 #include "itkMultiThreader.h"
+#include <iomanip>
 
 int main(int, char * argv[])
 {
@@ -78,7 +79,7 @@ int main(int, char * argv[])
   radiusList.push_back( 15 );
   radiusList.push_back( 20 );
   
-  std::cout << "#radius" << "\t" 
+  std::cout << std::setprecision(3) << "#radius" << "\t" 
             << "rep" << "\t" 
             << "total" << "\t" 
             << "nb" << "\t" 
