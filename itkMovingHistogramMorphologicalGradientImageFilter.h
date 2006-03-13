@@ -27,32 +27,75 @@ template <class TInputPixel>
 class MorphologicalGradientHistogram
 {
 public:
-  MorphologicalGradientHistogram(){}
+  MorphologicalGradientHistogram()
+    {
+    if( useVectorBasedAlgorithm() )
+      { initVector(); }
+    }
   ~MorphologicalGradientHistogram(){}
-
-  typedef typename std::map< TInputPixel, unsigned long > HistogramType;
-
-  inline TInputPixel operator()( const HistogramType &histogram )
-  {
-    if( !histogram.empty() )
-      { return histogram.rbegin()->first - histogram.begin()->first; }
-    return 0;
-  }
 
   inline void AddBoundary() {}
 
   inline void RemoveBoundary() {}
 
   inline void AddPixel( const TInputPixel &p )
-    { m_Map[ p ]++; }
+    {
+    if( useVectorBasedAlgorithm() )
+      { AddPixelVector( p ); }
+    else
+      { AddPixelMap( p ); }
+    }
 
   inline void RemovePixel( const TInputPixel &p )
-    { m_Map[ p ]--; }
+    {
+    if( useVectorBasedAlgorithm() )
+      { RemovePixelVector( p ); }
+    else
+      { RemovePixelMap( p ); }
+    }
 
   inline TInputPixel GetValue()
     {
+    if( useVectorBasedAlgorithm() )
+      { return GetValueVector(); }
+    else
+      { return GetValueMap(); }
+    }
+
+
+  inline bool useVectorBasedAlgorithm()
+    {
+    // bool, short and char are acceptable for vector based algorithm: they do not require
+    // too much memory. Other types are not usable with that algorithm
+    return typeid(TInputPixel) == typeid(unsigned char)
+        || typeid(TInputPixel) == typeid(signed char)
+        || typeid(TInputPixel) == typeid(unsigned short)
+        || typeid(TInputPixel) == typeid(signed short)
+        || typeid(TInputPixel) == typeid(bool);
+    }
+
+
+
+
+
+
+
+  //
+  // the map based algorithm
+  //
+
+  typedef typename std::map< TInputPixel, unsigned long > MapType;
+
+  inline void AddPixelMap( const TInputPixel &p )
+    { m_Map[ p ]++; }
+
+  inline void RemovePixelMap( const TInputPixel &p )
+    { m_Map[ p ]--; }
+
+  inline TInputPixel GetValueMap()
+    {
     // clean the map
-    typename HistogramType::iterator mapIt = m_Map.begin();
+    typename MapType::iterator mapIt = m_Map.begin();
     while( mapIt != m_Map.end() )
       {
       if( mapIt->second == 0 )
@@ -76,7 +119,71 @@ public:
     return 0;
     }
 
-  HistogramType m_Map;
+  MapType m_Map;
+
+
+
+
+
+
+
+  //
+  // the vector based algorithm
+  //
+
+  inline void initVector()
+    {
+    // initialize members need for the vector based algorithm
+    m_Vector.resize( static_cast<int>( NumericTraits< TInputPixel >::max() - NumericTraits< TInputPixel >::NonpositiveMin() + 1 ), 0 );
+    m_Max = NumericTraits< TInputPixel >::NonpositiveMin();
+    m_Min = NumericTraits< TInputPixel >::max();
+    m_Count = 0;
+    }
+
+  inline void AddPixelVector( const TInputPixel &p )
+    {
+    m_Vector[ static_cast<int>( p - NumericTraits< TInputPixel >::NonpositiveMin() ) ]++;
+    if( p > m_Max )
+      { m_Max = p; }
+    if( p < m_Min )
+      { m_Min = p; }
+    m_Count++;
+    }
+
+  inline void RemovePixelVector( const TInputPixel &p )
+    {
+    m_Vector[ static_cast<int>( p - NumericTraits< TInputPixel >::NonpositiveMin() ) ]--;
+    m_Count--;
+    if( m_Count > 0 )
+      {
+      while( m_Vector[ static_cast<int>( m_Max - NumericTraits< TInputPixel >::NonpositiveMin() ) ] == 0 )
+        { m_Max--; }
+      while( m_Vector[ static_cast<int>( m_Min - NumericTraits< TInputPixel >::NonpositiveMin() ) ] == 0 )
+        { m_Min++; }
+      }
+    else
+      {
+      m_Max = NumericTraits< TInputPixel >::NonpositiveMin();
+      m_Min = NumericTraits< TInputPixel >::max();
+      }
+    }
+
+  inline TInputPixel GetValueVector()
+    {
+    if( m_Count > 0 )
+      { return m_Max - m_Min; }
+    else
+      { return NumericTraits< TInputPixel >::Zero; }
+    }
+
+  std::vector<unsigned long> m_Vector;
+  TInputPixel m_Min;
+  TInputPixel m_Max;
+  unsigned long m_Count;
+
+
+
+
 };
 } // end namespace Function
 
