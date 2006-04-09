@@ -33,7 +33,7 @@ colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue},
 
 % The title should be descriptive enough for people to be able to find
 % the relevant document. 
-\title{Moving histogram filters}
+\title{Efficient grayscale morphology using moving histogram algorithm}
 
 % Increment the release number whenever significant changes are made.
 % The author and/or editor can define 'significant' however they like.
@@ -54,13 +54,100 @@ colorlinks,linkcolor={blue},citecolor={blue},urlcolor={blue},
 
 \begin{abstract}
 \noindent
-Grayscale dilation and erosion are the basic transformation of mathemaical morphology.
-They can be very time consuming, especially with 3D images, and with large sturcturing
-elements.
+Grayscale dilation and erosion are basic transformations of mathemaical
+morphology. Used together or with other transformations, they are very useful
+tool for image analysis. However, they can be very time consuming, especially
+with 3D images, and with large structuring elements. Several algorithms have
+been created to decrease the computation time. Most of the time, they are
+limited to structuring elements with particular property of shape or size. The
+moving histogram algorithm \cite{vandroogenbroeckTalbot96} implemented in this
+contribution does not suffer this limitation and so is well suited for usage in
+a generalist library like ITK. We also introduce a meta filter designed to
+select the best algorithm depending on the image and the structuring element.
+This meta filter is also a step toward a soft integration of more efficent
+algorithm but limited to some shape of structuring elements like the Van
+Herk/Gil-Werman algorithm \cite{vanHerk92,GilWerman93}.
 \end{abstract}
 
-\tableofcontents
+% \tableofcontents
 
+
+\section{Introduction}
+
+  \subsection{Definition}
+
+  \subsection{Examples}
+
+  \subsection{Algorithms review}
+
+\section{Algorithm}
+
+\section{Implementation}
+
+\section{Implementing other transformations with the {\em MovingHistogramImageFilter} class}
+
+\section{Performance}
+
+  \subsection{Impact of the size of the image}
+
+To determine the impact of the size of the image on the performance of the two
+algorithms, we have run the tests with different sizes of image, always with
+the same structuring element: a disc of radius 5.
+
+The test can be repeated with the command
+\verb$./perf_image_size ../images/niece.jpg$.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{perf_image_size}
+\caption{Impact of image size on performance of the two algorithms.\label{perf_image_size}}
+\end{figure}
+
+A close look at Figure \ref{perf_image_size} show that none of the algorithm
+have a linear execution time depending on the image size. This non-linearity can
+be explained by the optimization of the algorithms in the center of the
+image. The higher curvature observed for the basic algorithm show that the
+optimization is more efficient for the basic algorithm. This result is
+consistent with the analyze of the algorithms: the basic one does no test in the
+center of the image while the moving histogram one keeps doing one test per
+pixel to determine that further tests can be avoided.
+
+  \subsection{Impact of the size of the structuring element}
+
+Figure \ref{perf2D-total} show that the execution time is linear depending on
+the full size of the structuring element (not the number of neighbours in it)
+for the basic algorithm, while Figure \ref{perf2D-hnb} show that the execution
+time of the moving histogram algorithm is linear depending on the number of
+pixel added and removed per translation.
+
+The moving histogram algorithm have a lower complexity for common cases, like
+disc or square structuring element.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{perf2D-total}
+\caption{Impact of image size on performance of the two algorithms.\label{perf2D-total}}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{perf2D-hnb}
+\caption{Impact of image size on performance of the two algorithms.\label{perf2D-hnb}}
+\end{figure}
+
+  \subsection{Impact of the number of neighbours in the structuring element}
+
+  \subsection{Impact of shape of the structuring element}
+
+  \subsection{Impact of the number of threads}
+
+  \subsection{Impact of pixel type}
+
+\section{Meta filter}
+
+\section{Acknolegements}
+
+\section{Conclusion}
 
 % \url{http://www.itk.org}
 % \code{Insight/Documentation/Style.pdf}
@@ -81,11 +168,6 @@ elements.
 
 % \ref{cthead1}
 
-% \begin{figure}[htbp]
-% \centering
-% \includegraphics{cthead1}
-% \caption{The input image.\label{cthead1}}
-% \end{figure}
 % 
 
 \appendix
@@ -93,7 +175,7 @@ elements.
 
 
 \bibliographystyle{plain}
-\bibliography{InsightJournal}
+\bibliography{Article,InsightJournal}
 \nocite{ITKSoftwareGuide}
 
 \end{document}

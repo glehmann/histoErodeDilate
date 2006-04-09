@@ -36,17 +36,10 @@ int main(int, char * argv[])
   dilate->SetInput( reader->GetOutput() );
   
   reader->Update();
-  
-  std::vector< int > radiusList;
-  for( int s=1; s<=121; s++)
-    { radiusList.push_back( s ); }
-/*  for( int s=15; s<=30; s+=5)
-    { radiusList.push_back( s ); }
-  radiusList.push_back( 40 );
-  radiusList.push_back( 50 );
-  radiusList.push_back( 75 );
-  radiusList.push_back( 100 );
-  radiusList.push_back( 121 );*/
+
+  int radius = 3;
+  int total = (radius*2+1)*(radius*2+1);
+
   
   std::cout << "#radius" << "\t" 
             << "rep" << "\t" 
@@ -56,16 +49,16 @@ int main(int, char * argv[])
             << "d" << "\t" 
             << "hd" << std::endl;
 
-  for( std::vector< int >::iterator it=radiusList.begin(); it !=radiusList.end() ; it++)
+  for( int s=1; s<=total; s++)
     {
     itk::TimeProbe dtime;
     itk::TimeProbe hdtime;
 
-    kernel.SetRadius( 5 );
+    kernel.SetRadius( radius );
     unsigned long nbOfNeighbors = 0;
     for( SRType::Iterator kit=kernel.Begin(); kit!=kernel.End(); kit++ )
       {
-      if( nbOfNeighbors <= *it )
+      if( nbOfNeighbors <= s )
         { *kit = 1; }
       else
         { *kit = 0; }
@@ -78,16 +71,7 @@ int main(int, char * argv[])
     dilate->SetKernel( kernel );
     hdilate->SetKernel( kernel );
 
-    int nbOfRepeats;
-    if( *it <= 10 )
-      { nbOfRepeats = 20; }
-    else if( *it <= 20 )
-      { nbOfRepeats = 10; }
-    else if( *it <= 50 )
-      { nbOfRepeats = 5; }
-    else
-      { nbOfRepeats = 2; }
-    nbOfRepeats = 1;
+    int nbOfRepeats = 5;
 
     for( int i=0; i<nbOfRepeats; i++ )
       {
@@ -101,10 +85,10 @@ int main(int, char * argv[])
       hdilate->Modified();
       }
       
-    std::cout << 5 << "\t" 
+    std::cout << radius << "\t" 
               << nbOfRepeats << "\t" 
-              << 121 << "\t" 
-              << *it << "\t"
+              << total << "\t" 
+              << s << "\t"
               << hdilate->GetPixelsPerTranslation() << "\t" 
               << dtime.GetMeanTime() << "\t" 
               << hdtime.GetMeanTime() << std::endl;
