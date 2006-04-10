@@ -77,6 +77,12 @@ public:
   /** Kernel typedef. */
   typedef TKernel KernelType;
   
+  /** Typedef for boundary conditions. */
+  typedef ImageBoundaryCondition<InputImageType> *ImageBoundaryConditionPointerType;
+  typedef ImageBoundaryCondition<InputImageType> const *ImageBoundaryConditionConstPointerType;
+  typedef ConstantBoundaryCondition<InputImageType> DefaultBoundaryConditionType;
+
+
   /** Set kernel (structuring element). */
   void SetKernel( const KernelType& kernel );
 
@@ -100,6 +106,37 @@ public:
 
   /** GrayscaleErodeImageFilter need to set its internal filters as modified */
   virtual void Modified() const;
+
+  /** \deprecated
+  * Allows a user to override the internal boundary condition. Care should be
+  * be taken to ensure that the overriding boundary condition is a persistent
+  * object during the time it is referenced. The overriding condition
+  * can be of a different type than the default type as long as it is
+  * a subclass of ImageBoundaryCondition. */
+  void OverrideBoundaryCondition(const DefaultBoundaryConditionType* i)
+    {
+    itkLegacyBody(itk::GrayscaleErodeImageFilter::OverrideBoundaryCondition, 2.8);
+    SetBoundary( i->GetConstant() );
+    }
+
+  /** \deprecated
+   * Get the current boundary condition.
+   */
+  const DefaultBoundaryConditionType* GetBoundaryCondition()
+    {
+    itkLegacyBody(itk::GrayscaleErodeImageFilter::GetBoundaryCondition, 2.8);
+    return &m_BoundaryCondition;
+    }
+
+  /** \deprecated
+   * Rest the boundary condition to the default
+   */
+  void ResetBoundaryCondition()
+    {
+    itkLegacyBody(itk::GrayscaleErodeImageFilter::ResetBoundaryCondition, 2.8);
+    SetBoundary( itk::NumericTraits< PixelType >::max() );
+    }
+
 
 protected:
   GrayscaleErodeImageFilter();
@@ -125,7 +162,7 @@ private:
   const char* m_NameOfBackendFilterClass;
 
   // the boundary condition need to be stored here
-  typename itk::ConstantBoundaryCondition< TInputImage > m_BoundaryCondition;
+  DefaultBoundaryConditionType m_BoundaryCondition;
   
 } ; // end of class
 

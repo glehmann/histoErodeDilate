@@ -126,6 +126,10 @@ SET(CurrentExe "metaGradient2D")
 ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
 TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
 
+SET(CurrentExe "deprecated")
+ADD_EXECUTABLE(${CurrentExe} ${CurrentExe}.cxx) 
+TARGET_LINK_LIBRARIES(${CurrentExe} ${Libraries})
+
 #the following line is an example of how to add a test to your project.
 #Testname is the title for this particular test.  ExecutableToRun is the
 #program which will be running this test.  It can either be a part of this
@@ -161,4 +165,6 @@ ADD_TEST(MetaDilate2DCompare ${IMAGE_COMPARE} bmetaDilate2D.png hmetaDilate2D.pn
 
 ADD_TEST(MetaGradient2D metaGradient2D ${CMAKE_SOURCE_DIR}/images/cthead1.png bmetaGradient2D.png hmetaGradient2D.png)
 ADD_TEST(MetaGradient2DCompare ${IMAGE_COMPARE} bmetaGradient2D.png hmetaGradient2D.png)
+
+ADD_TEST(DeprecatedAPI deprecated)
 
