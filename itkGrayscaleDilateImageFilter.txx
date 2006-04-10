@@ -123,6 +123,9 @@ void
 GrayscaleDilateImageFilter< TInputImage, TOutputImage, TKernel>
 ::SetNameOfBackendFilterClass( const char * name )
 {
+  if( name == NULL )
+    { itkExceptionMacro( << "Invalid name of class." ); }
+
   if( strcmp( m_NameOfBackendFilterClass, name ) )
     {
     if( !strcmp( name, m_BasicFilter->GetNameOfClass() ) )
