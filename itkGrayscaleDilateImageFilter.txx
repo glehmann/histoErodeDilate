@@ -34,7 +34,7 @@ GrayscaleDilateImageFilter<TInputImage, TOutputImage, TKernel>
   m_HistogramFilter = HistogramFilterType::New();
   m_NameOfBackendFilterClass = m_HistogramFilter->GetNameOfClass();
 
-  this->SetBoundary( itk::NumericTraits< PixelType >::max() );
+  this->SetBoundary( itk::NumericTraits< PixelType >::NonpositiveMin() );
 }
 
 template<class TInputImage, class TOutputImage, class TKernel>
