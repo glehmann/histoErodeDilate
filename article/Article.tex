@@ -74,13 +74,107 @@ Herk/Gil-Werman algorithm \cite{vanHerk92,GilWerman93}.
 
 \section{Introduction}
 
-  \subsection{Definition}
+  \subsection{Definition and examples}
 
-  \subsection{Examples}
+Dilation and erosion are performed on all pixels of the image with a (small)
+set of neighbors of this pixel.
+The dilated value of a pixel in the resulting image is the maximum value
+of the neighbors given by the structuring element in the source image.
+By duality, the eroded value of a pixel in the resulting image is the
+minimum value of the neighbors given by the structuring element in the
+source image.
+
+Other transformations are defined in a similar way than dilation and erosion.
+While we use maximum or minimum value in a neighborhood to define dilation and
+erosion, other transformations can be defined with other statistical values
+get from the set of neighbors, like mean, median, sigma, ...
+
+The neighborhood can be not complete on the border of the image. In practice,
+we often considere that the border have a defined value, which must be chosen
+by the user. The default border value is set to get the same result as the
+one we should have if the neighbors outside the image have been discarded\footnote{
+It is true only if the structuring element is symetric. If the structuring element
+is not symetric, some pixel in the resulting image may get undefined value
+if the neighbors outside the image are discarded instead of getting a border
+value}.
+
+While interest of grayscale dilation or erosion used alone is not as evident
+than in binary case, but used with other transformations, they become very powerfull
+tools for image analysis. The following transformations are based on grayscale
+erosion and/or dilation:
+\begin{itemize}
+
+  \item Black and white top-hats
+
+  \item Grayscale opening and closing
+
+  \item Grayscale opening and closing by reconstruction
+
+  \item Morphological gradients
+
+\end{itemize}
+
 
   \subsection{Algorithms review}
 
-\section{Algorithm}
+The following algorithms will be detailed for dilation, but can be transposed to
+erosion just but substituting maximum by minimum.
+
+\begin{itemize}
+
+  \item Basic algorithm
+
+For all pixels of the image, get the values of the neighbors defined by the structuring
+element, and assign the maximum value to the corresponding pixel of the output image.
+The structuring element can be defined in two ways which impact the complexity of the
+algorithm:
+  \begin{itemize}
+    \item the structuring element is defined in a table with the same dimensionality than
+the image, and all the value into it define if the neighbor is or is not in the neighborhood.
+The algorithm complexity in that case is O(IxT) where I is the image size, and T is the total
+size of the structuring element.
+    \item the structuring element is defined as a list of offsets to the current output
+pixel.
+The algorithm complexity in that case is O(IxN) where I is the image size, and N is the
+number of neighbors in the structuring element. Note that T >= N.
+  \end{itemize}
+
+Both definition have their advantage: while the second one require to check less neighbors
+than the first one, it also bring the cost of managing the offsets list. In practice,
+the first one will be more efficient with structuring element with a small numbers of
+neighbors excluded from the neighborhood, and the second one will be more efficient if
+there is lots of neighbors excluded from the neighborhood.
+
+The current implementation of dilation and erosion filters in ITK use this algorithm,
+with the first structuring element definition.
+
+  \item Moving histogram
+
+This algorithm try to reduce the complexity of the previous algorithm by maintaining
+a data structure which store the values covered by the structuring element. When we go
+to the next output pixel, the data structure is updated with the neighbor values removed
+and the neighbor values added, and so decrease the number of pixel manipulated for
+each output pixel.
+
+!!! Talk about translation, zizag, best dimension !!!
+
+The complexity of this algorithm is O(IxNT) where I is the image size, and NT the number
+of pixel values added and removed to the data structure per translation on the best
+dimension.
+In the worst case, the complexity is O(IxT).
+
+  \item Van Herk/Gil-Werman
+
+  \item Structuring element decomposition
+
+Erosion and dilation can be performed in several step to decrease the computation time.
+For example, an erosion of a 2D image by a box of size WxH is equivalent to an erosion
+of the same image with a structuring element of size Wx1 followed by an erosion with
+a second structuring element of size 1xH. In the case of basic algorithm, the complexity
+becomes O(Ix(W+H)) instead of O(IxWXH). In case of moving histogram and van Herk/Gil-Werman
+algorithm, the complexity become O(Ix2)
+
+\end{itemize}
 
 \section{Implementation}
 
