@@ -23,7 +23,7 @@
 #include <set>
 #include "itkOffsetLexicographicCompare.h"
 
-// #define zigzag
+//#define zigzag
 
 namespace itk {
 
@@ -153,6 +153,7 @@ protected:
 		       const IndexType PrevLineStart,
 		       const int ImageDimension,
 		       OffsetType &LineOffset,
+		       OffsetType &Changes,
 		       int &LineDirection);
 
 #endif

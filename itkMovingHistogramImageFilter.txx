@@ -370,7 +370,7 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
                        int threadId) 
 {
     
-    // instanciate the histogram
+    // instantiate the histogram
     HistogramType histogram = this->NewHistogram();
     
     OutputImageType* outputImage = this->GetOutput();
@@ -403,6 +403,8 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
       { centerOffset[axis] = stRegion.GetSize()[axis] / 2; }
 
     int BestDirection = this->m_Axes[axis];
+    int LineLength = inputRegion.GetSize()[BestDirection];
+
     // Report progress every line instead of every pixel
     ProgressReporter progress(this, threadId, outputRegionForThread.GetNumberOfPixels()/outputRegionForThread.GetSize()[BestDirection]);
     // init the offset and get the lists for the best axis
@@ -427,16 +429,21 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
     typedef typename std::vector<IndexType> IndexVecType;
     IndexVecType PrevLineStartVec(ImageDimension);
 
+    // Steps is used to keep track of the order in which the line
+    // iterator passes over the various dimensions.
+    int *Steps = new int[ImageDimension];
+
     for (int i=0;i<ImageDimension;i++)
       {
       HistVec[i] = histogram;
       PrevLineStartVec[i] = InLineIt.GetIndex();
+      Steps[i]=0;
       }
 
     while(!InLineIt.IsAtEnd())
       {
       HistogramType *histRef = &(HistVec[BestDirection]);
-//      PrevLineStart = InLineIt.GetIndex();
+      IndexType PrevLineStart = InLineIt.GetIndex();
       for (InLineIt.GoToBeginOfLine(); !InLineIt.IsAtEndOfLine(); ++InLineIt)
 	{
 	
@@ -448,6 +455,7 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
 		      stRegion, inputImage, currentIdx);
 
 	}
+      Steps[BestDirection] += LineLength;
       InLineIt.NextLine();
       if (InLineIt.IsAtEnd())
 	{
@@ -459,40 +467,38 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
       // histogram to update and the direction in which to push
       // it. Then we need to copy that histogram to the relevant
       // places
-      OffsetType LineOffset;
+      OffsetType LineOffset, Changes;
       // Figure out which stored histogram to move and in
       // which direction
       int LineDirection;
-      IndexType PrevLineStart = PrevLineStartVec[BestDirection];
-
       // This function deals with changing planes etc
       GetDirAndOffset(LineStart, PrevLineStart, ImageDimension,
-		      LineOffset, LineDirection);
-
+		      LineOffset, Changes, LineDirection);
+      ++(Steps[LineDirection]);
+      IndexType PrevLineStartHist = LineStart - LineOffset;
       const OffsetListType* addedListLine = &this->m_AddedOffsets[LineOffset];;
       const OffsetListType* removedListLine = &this->m_RemovedOffsets[LineOffset];
       HistogramType *tmpHist = &(HistVec[LineDirection]);
-      stRegion.SetIndex(PrevLineStartVec[LineDirection] - centerOffset);
+      stRegion.SetIndex(PrevLineStart - centerOffset);
       // Now move the histogram
       pushHistogram(*tmpHist, addedListLine, removedListLine, inputRegion, 
-		    stRegion, inputImage, PrevLineStartVec[LineDirection]);
+		    stRegion, inputImage, PrevLineStartHist);
 
-      PrevLineStartVec[LineDirection] = LineStart;
+      //PrevLineStartVec[LineDirection] = LineStart;
       // copy the updated histogram and line start entries to the
       // relevant directions. When updating direction 2, for example,
       // new copies of directions 0 and 1 should be made.
       for (int i=0;i<ImageDimension;i++) 
 	{
-	int idx = this->m_Axes[i];
-	if (idx< LineDirection)
+	if (Steps[i] > Steps[LineDirection])
 	  {
-	  PrevLineStartVec[idx] = LineStart;
-	  HistVec[idx] = HistVec[LineDirection];
+	  //PrevLineStartVec[i] = LineStart;
+	  HistVec[i] = HistVec[LineDirection];
 	  }
 	}
       progress.CompletedPixel();
       }
-
+    delete [] Steps;
 }
 
 template<class TInputImage, class TOutputImage, class TKernel, class THistogram>
@@ -559,12 +565,13 @@ MovingHistogramImageFilter<TInputImage, TOutputImage, TKernel, THistogram>
 		  const IndexType PrevLineStart,
 		  const int ImageDimension,
 		  OffsetType &LineOffset,
+		  OffsetType &Changes,
 		  int &LineDirection)
 {
   // when moving between lines in the same plane there should be only
   // 1 non zero (positive) entry in LineOffset.
   // When moving between planes there will be some negative ones too.
-  LineOffset = LineStart - PrevLineStart;
+  LineOffset = Changes = LineStart - PrevLineStart;
   for (int y=0;y<ImageDimension;y++) 
     {
     if (LineOffset[y] > 0)
